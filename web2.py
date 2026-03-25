@@ -39,7 +39,7 @@ def list_demo():
     print("Original list:", fruits)
 
     fruits.append("Orange")
-    print("After adding Oranges:", fruits)
+    print("After adding Orange:", fruits)
 
     print("Looping through list:")
     for fruit in fruits:
