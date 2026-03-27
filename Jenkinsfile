@@ -25,7 +25,7 @@ pipeline {
         success {
             
             sh 'ls -lh'
-            //archiveArtifacts artifacts: 'Build_Python_project/**'
+            archiveArtifacts artifacts: 'Jenkins-testing/**'
         }
     }
 }
