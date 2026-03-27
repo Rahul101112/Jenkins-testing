@@ -15,7 +15,8 @@ pipeline {
             steps {
                 sh 'echo "Testing completed for the python project"'
                 sh 'ps -ef'
-                sh 'sudo apt udpate'
+                sh 'ip addr >> new.txt'
+                sh 'cat new.txt'
                 }
         }
     }
