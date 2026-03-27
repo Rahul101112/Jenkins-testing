@@ -25,6 +25,7 @@ pipeline {
             
             sh 'ls -lh'
             archiveArtifacts artifacts: '*.py'
+            cleanWs()
         }
     }
 }
