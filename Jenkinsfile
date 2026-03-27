@@ -14,8 +14,7 @@ pipeline {
         {
             steps {
                 sh 'echo "Testing completed for the python project"'
-                sh 'ps -ef'
-                sh 'ip addr >> new.txt'
+                sh 'ip addr > new.txt'
                 sh 'cat new.txt'
                 }
         }
@@ -25,7 +24,7 @@ pipeline {
         success {
             
             sh 'ls -lh'
-            archiveArtifacts artifacts: 'Jenkins-testing/**'
+            archiveArtifacts artifacts: '*.py'
         }
     }
 }
