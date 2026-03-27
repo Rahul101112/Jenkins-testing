@@ -7,7 +7,7 @@ pipeline {
         {
             steps {
                 sh 'python3 web2.py'
-                }
+            }
         }
 
         stage('Test_python') 
@@ -15,13 +15,14 @@ pipeline {
             steps {
                 sh 'echo "Testing completed for the python project"'
                 sh 'ip addr > Artifacts/Artifacts.txt'
-                }
+            }
         }
     }
 
-    post{
-        success {
-            
+    post {
+
+        success('Archive Artifacts') 
+        {
             sh 'ls -lh'
             archiveArtifacts artifacts: 'Artifacts/*.txt'
             cleanWs()
