@@ -1,7 +1,0 @@
-This is my text file to keep all the project details
-
-1. Like migration dates
-2. migration Plan 
-3. Schedule times
-4. jenkins file added
-chanegs done
