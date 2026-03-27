@@ -23,7 +23,7 @@ pipeline {
         success {
             
             sh 'ls -lh'
-            archiveArtifacts artifacts: '/Artifacts/*.txt'
+            archiveArtifacts artifacts: 'Artifacts/*.txt'
             cleanWs()
         }
     }
