@@ -14,8 +14,7 @@ pipeline {
         {
             steps {
                 sh 'echo "Testing completed for the python project"'
-                sh 'ip addr > new.txt'
-                sh 'cat new.txt'
+                sh 'python3 web2.py > /Artifacts/Artifacts.txt'
                 }
         }
     }
@@ -24,7 +23,7 @@ pipeline {
         success {
             
             sh 'ls -lh'
-            archiveArtifacts artifacts: '*.py'
+            archiveArtifacts artifacts: '/Artifacts/*.txt'
             cleanWs()
         }
     }
