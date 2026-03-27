@@ -7,7 +7,8 @@ pipeline {
         stage('Run') {
             steps {
                 sh 'python3 web2.py'
-            }
+		}
+
         }
     }
 }
