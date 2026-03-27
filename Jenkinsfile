@@ -6,7 +6,6 @@ pipeline {
         stage('Build_Python_project') 
         {
             steps {
-                cleanWs()
                 sh 'python3 web2.py'
                 }
         }
