@@ -23,7 +23,9 @@ pipeline {
 
     post{
         success {
-            archiveArtifacts artifacts: 'Build_Python_project/**'
+            
+            sh 'ls -lh'
+            //archiveArtifacts artifacts: 'Build_Python_project/**'
         }
     }
 }
