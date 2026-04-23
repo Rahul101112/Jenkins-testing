@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Jenkins – Interview & Day-to-Day Mastery</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap');
+
+  :root {
+    --bg: #0d0f14;
+    --surface: #13161e;
+    --border: #1e2330;
+    --accent1: #f7c948;
+    --accent2: #e85d3a;
+    --accent3: #3ae8b5;
+    --accent4: #7b6ef6;
+    --text: #e8eaf0;
+    --muted: #7a7f96;
+    --card: #161a25;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── GRID BACKGROUND ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: .45;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 48px 20px 80px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 56px;
+  }
+
+  .eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--accent3);
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    color: #fff;
+  }
+
+  h1 span { color: var(--accent1); }
+
+  .sub {
+    font-size: 15px;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.6;
+    margin-top: 4px;
+  }
+
+  /* ── LEGEND ── */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+
+  .badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-weight: 700;
+  }
+
+  .badge-interview { background: #f7c94820; color: var(--accent1); border: 1px solid #f7c94840; }
+  .badge-technical { background: #7b6ef620; color: var(--accent4); border: 1px solid #7b6ef640; }
+  .badge-daily     { background: #3ae8b520; color: var(--accent3); border: 1px solid #3ae8b540; }
+  .badge-advanced  { background: #e85d3a20; color: var(--accent2); border: 1px solid #e85d3a40; }
+
+  /* ── SECTION TITLES ── */
+  .section-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--muted);
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── CARDS GRID ── */
+  .grid { display: grid; gap: 2px; margin-bottom: 40px; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 22px 24px;
+    position: relative;
+    transition: transform .15s, border-color .15s;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+    border-color: #2d3348;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .card-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    min-width: 24px;
+    padding-top: 3px;
+  }
+
+  .card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    flex: 1;
+    line-height: 1.3;
+  }
+
+  .card-body {
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-left: 36px;
+  }
+
+  .card-body ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .card-body ul li {
+    padding: 3px 0 3px 14px;
+    position: relative;
+  }
+
+  .card-body ul li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--accent1);
+    font-weight: 700;
+  }
+
+  /* coloured left bar per tag */
+  .card.interview { border-left: 3px solid var(--accent1); }
+  .card.technical { border-left: 3px solid var(--accent4); }
+  .card.daily     { border-left: 3px solid var(--accent3); }
+  .card.advanced  { border-left: 3px solid var(--accent2); }
+
+  /* ── CODE CHIP ── */
+  code {
+    font-family: 'Space Mono', monospace;
+    font-size: 11.5px;
+    background: #1e2330;
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--accent3);
+  }
+
+  /* ── DAILY OPS TABLE ── */
+  .ops-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin-bottom: 40px;
+  }
+
+  @media(max-width:600px) { .ops-grid { grid-template-columns: 1fr; } }
+
+  .ops-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent3);
+    padding: 18px 20px;
+    transition: border-color .15s;
+  }
+
+  .ops-card:hover { border-color: #3ae8b580; }
+
+  .ops-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent3);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+  }
+
+  .ops-list {
+    list-style: none;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+
+  .ops-list li::before { content: '• '; color: var(--accent3); }
+
+  /* ── ROADMAP ── */
+  .roadmap {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 40px;
+  }
+
+  .rm-row {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 0;
+  }
+
+  .rm-week {
+    background: #1a1e2c;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent1);
+    font-weight: 700;
+    letter-spacing: .08em;
+    padding: 16px 8px;
+    text-align: center;
+  }
+
+  .rm-content {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: none;
+    padding: 14px 20px;
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .rm-content strong { color: var(--text); }
+
+  /* ── FOOTER ── */
+  footer {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: #3a3f55;
+    text-align: center;
+    margin-top: 60px;
+    letter-spacing: .1em;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header>
+    <div class="eyebrow">DevOps Learning Path · Jenkins</div>
+    <h1>Interview Ready &<br/><span>Day-to-Day</span> Jenkins</h1>
+    <p class="sub">A complete technical breakdown of every Jenkins topic you need to crack interviews and operate pipelines in a production environment.</p>
+  </header>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <span class="badge badge-interview">🟡 Interview Must-Know</span>
+    <span class="badge badge-technical">🟣 Deep Technical</span>
+    <span class="badge badge-daily">🟢 Day-to-Day Ops</span>
+    <span class="badge badge-advanced">🔴 Advanced / Senior</span>
+  </div>
+
+  <!-- SECTION 1: CORE FUNDAMENTALS -->
+  <div class="section-title">01 — Core Fundamentals</div>
+  <div class="grid">
+
+    <div class="card interview">
+      <div class="card-header">
+        <span class="card-num">01</span>
+        <span class="card-title">What is Jenkins & How It Works</span>
+        <span class="badge badge-interview">Interview</span>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li>CI/CD orchestration server — open-source, Java-based</li>
+          <li>Master/Agent (Controller/Agent) architecture</li>
+          <li>Polling SCM vs Webhooks vs manual triggers</li>
+          <li>Jenkins workspace, executor threads, build queue</li>
+          <li>How Jenkins differs from GitHub Actions / Azure DevOps</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card interview">
+      <div class="card-header">
+        <span class="card-num">02</span>
+        <span class="card-title">Freestyle Jobs vs Pipeline Jobs</span>
+        <span class="badge badge-interview">Interview</span>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li>Freestyle: UI-driven, no code, limited reuse</li>
+          <li>Pipeline: code-as-config via <code>Jenkinsfile</code></li>
+          <li>Declarative Pipeline vs Scripted Pipeline (Groovy DSL)</li>
+          <li>When to use each — interview favourite question</li>
+          <li>Multi-branch Pipeline & Organization Folders</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card interview">
+      <div class="card-header">
+        <span class="card-num">03</span>
+        <span class="card-title">Jenkinsfile Structure & Syntax</span>
+        <span class="badge badge-interview">Interview</span>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li><code>pipeline {}</code> → <code>agent</code> → <code>stages</code> → <code>stage</code> → <code>steps</code></li>
+          <li><code>environment {}</code> block for env vars</li>
+          <li><code>post { always/success/failure/unstable }</code></li>
+          <li><code>parameters {}</code> — string, boolean, choice</li>
+          <li><code>when {}</code> conditional execution</li>
+          <li><code>options {}</code> — timeout, retry, skipDefaultCheckout</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SECTION 2: PIPELINE DEEP DIVE -->
+  <div class="section-title">02 — Pipeline Architecture</div>
+  <div class="grid">
+
+    <div class="card technical">
+      <div class="card-header">
+        <span class="card-num">04</span>
+        <span class="card-title">Agents & Executors</span>
+        <span class="badge badge-technical">Technical</span>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li><code>agent any</code>, <code>agent none</code>, <code>agent { label '...' }</code></li>
+          <li>Docker agent — <code>agent { docker { image '...' } }</code></li>
+          <li>Kubernetes agent (pod templates)</li>
+          <li>SSH agents, JNLP agents, inbound vs outbound</li>
+          <li>Executor count tuning, offline agents, node labels</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card technical">
+      <div class="card-header">
+        <span class="card-num">05</span>
+        <span class="card-title">Parallel & Matrix Execution</span>
+        <span class="badge badge-technical">Technical</span>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li><code>parallel { stage('A'){} stage('B'){} }</code></li>
+          <li><code>failFast true</code> — abort all branches on failure</li>
+          <li>Matrix axes — OS × JDK cross-testing</li>
+          <li>Parallel test execution for faster feedback loops</li>
+          <li>Stash / unstash to pass artifacts between stages</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card technical">
+      <div class="card-header">
+        <span class="card-num">06</span>
+        <span class="card-title">Shared Libraries</span>
+        <span class="badge badge-technical">Technical</span>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li>Structure: <code>vars/</code>, <code>src/</code>, <code>resources/</code></li>
+          <li>Global vs folder-scoped libraries</li>
+          <li><code>@Library('my-lib') _</code> import syntax</li>
+          <li>Writing reusable <code>vars/deploy.groovy</code> steps</li>
+          <li>Version pinning of shared libraries</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card technical">
+      <div class="card-header">
+        <span class="card-num">07</span>
+        <span class="card-title">Triggers & Build Strategies</span>
+        <span class="badge badge-technical">Technical</span>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li>GitHub/GitLab Webhooks — <code>GenericTrigger</code> plugin</li>
+          <li>Poll SCM cron syntax: <code>H/5 * * * *</code></li>
+          <li>Upstream/downstream job chaining (<code>build job:</code>)</li>
+          <li>Periodic build triggers, parameterized triggers</li>
+          <li>Build on PR / branch filter strategy</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SECTION 3: SECURITY & CREDENTIALS -->
+  <div class="section-title">03 — Security & Credentials</div>
+  <div class="grid">
+
+    <div class="card interview">
+      <div class="card-header">
+        <span class="card-num">08</span>
+        <span class="card-title">Credentials Management</span>
+        <span class="badge badge-interview">Interview</span>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li>Jenkins Credential Store — types: Username/Password, SSH key, Secret text, Certificate, Secret file</li>
+          <li>Scopes: Global vs System vs Folder</li>
+          <li><code>withCredentials([])</code> binding in pipeline</li>
+          <li>Never echo secrets — Jenkins masks credentials in logs</li>
+          <li>Integrating with HashiCorp Vault / Azure Key Vault</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card interview">
+      <div class="card-header">
+        <span class="card-num">09</span>
+        <span class="card-title">Role-Based Access Control (RBAC)</span>
+        <span class="badge badge-interview">Interview</span>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li>Matrix Authorization Strategy plugin</li>
+          <li>Role Strategy plugin — roles, users, groups</li>
+          <li>Project-level permissions vs global permissions</li>
+          <li>Integration with LDAP / Active Directory (your strength!)</li>
+          <li>SSO via SAML / OAuth2 plugins</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SECTION 4: PLUGINS ECOSYSTEM -->
+  <div class="section-title">04 — Must-Know Plugins</div>
+  <div class="grid">
+
+    <div class="card technical">
+      <div class="card-header">
+        <span class="card-num">10</span>
+        <span class="card-title">Essential Plugins to Know</span>
+        <span class="badge badge-technical">Technical</span>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li><strong>Pipeline</strong> — declarative/scripted DSL</li>
+          <li><strong>Git / GitHub Integration</strong> — SCM checkout</li>
+          <li><strong>Docker Pipeline</strong> — build/push/run containers</li>
+          <li><strong>Blue Ocean</strong> — visual pipeline UI</li>
+          <li><strong>SonarQube Scanner</strong> — code quality gate</li>
+          <li><strong>Artifactory / Nexus</strong> — artifact publishing</li>
+          <li><strong>Kubernetes</strong> — dynamic pod agents</li>
+          <li><strong>Slack Notification</strong> — pipeline alerts</li>
+          <li><strong>Email Extension</strong> — rich build reports</li>
+          <li><strong>JUnit / Allure</strong> — test result publishing</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card technical">
+      <div class="card-header">
+        <span class="card-num">11</span>
+        <span class="card-title">Docker Integration</span>
+        <span class="badge badge-technical">Technical</span>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li>Build Docker image inside pipeline: <code>docker.build()</code></li>
+          <li>Push to DockerHub / ACR / ECR</li>
+          <li>Run containers as build agents</li>
+          <li>Multi-stage Dockerfile usage in CI</li>
+          <li>Jenkins user in Docker group — permission fix</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SECTION 5: ADVANCED -->
+  <div class="section-title">05 — Advanced Topics</div>
+  <div class="grid">
+
+    <div class="card advanced">
+      <div class="card-header">
+        <span class="card-num">12</span>
+        <span class="card-title">Jenkins as Code — JCasC</span>
+        <span class="badge badge-advanced">Advanced</span>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li>Jenkins Configuration as Code plugin (JCasC)</li>
+          <li>Define entire Jenkins config via YAML</li>
+          <li>Manage jobs via Job DSL plugin (Groovy)</li>
+          <li>Seed jobs — auto-generate pipelines from repo</li>
+          <li>GitOps approach: Jenkins config in version control</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card advanced">
+      <div class="card-header">
+        <span class="card-num">13</span>
+        <span class="card-title">Jenkins on Kubernetes</span>
+        <span class="badge badge-advanced">Advanced</span>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li>Deploy Jenkins via Helm chart</li>
+          <li>Dynamic agents using Kubernetes plugin (pod templates)</li>
+          <li>Persistent volume for Jenkins home</li>
+          <li>Scaling — ephemeral pods per build</li>
+          <li>Jenkins X — cloud-native CI/CD on K8s</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card advanced">
+      <div class="card-header">
+        <span class="card-num">14</span>
+        <span class="card-title">High Availability & Scaling</span>
+        <span class="badge badge-advanced">Advanced</span>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li>Jenkins HA setup — CloudBees HA (active/passive)</li>
+          <li>Distributed builds across multiple agents</li>
+          <li>Load balancing build executors</li>
+          <li>Backup of <code>$JENKINS_HOME</code> — ThinBackup plugin</li>
+          <li>Disaster recovery — restoring from backup</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card advanced">
+      <div class="card-header">
+        <span class="card-num">15</span>
+        <span class="card-title">Pipeline Optimization & Best Practices</span>
+        <span class="badge badge-advanced">Advanced</span>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li>Minimize checkout overhead — shallow clone</li>
+          <li>Cache dependencies between builds (node_modules, .m2)</li>
+          <li>Use <code>options { skipStagesAfterUnstable() }</code></li>
+          <li>Keep Jenkinsfile lean — move logic to shared libs</li>
+          <li>Build once, deploy many — promote artifacts</li>
+          <li>Immutable artifacts — never rebuild for each env</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SECTION 6: DAY-TO-DAY OPS -->
+  <div class="section-title">06 — Day-to-Day Business Support</div>
+  <div class="ops-grid">
+
+    <div class="ops-card">
+      <div class="ops-title">🔧 Build Management</div>
+      <ul class="ops-list">
+        <li>Monitor running / queued builds</li>
+        <li>Abort stuck builds, free executors</li>
+        <li>Replay failed pipeline from last run</li>
+        <li>Trigger parameterized builds manually</li>
+        <li>Archive / discard old build artifacts</li>
+      </ul>
+    </div>
+
+    <div class="ops-card">
+      <div class="ops-title">🔍 Troubleshooting Failures</div>
+      <ul class="ops-list">
+        <li>Read Console Output — identify root cause</li>
+        <li>SSH into agent to debug workspace</li>
+        <li>Fix agent offline — reconnect / restart</li>
+        <li>Resolve plugin version conflicts</li>
+        <li>Diagnose OOM kills in build containers</li>
+      </ul>
+    </div>
+
+    <div class="ops-card">
+      <div class="ops-title">🚀 Deployment Support</div>
+      <ul class="ops-list">
+        <li>Promote builds from Dev → QA → Prod</li>
+        <li>Rollback by redeploying a previous build</li>
+        <li>Manage approval gates (input step)</li>
+        <li>Deploy hotfixes via pipeline parameters</li>
+        <li>Blue/Green deploy orchestration via scripts</li>
+      </ul>
+    </div>
+
+    <div class="ops-card">
+      <div class="ops-title">🔒 Security & Compliance</div>
+      <ul class="ops-list">
+        <li>Rotate credentials in Jenkins Credential Store</li>
+        <li>Audit who triggered which build (Audit Trail plugin)</li>
+        <li>Enforce SonarQube quality gates — block bad code</li>
+        <li>Restrict prod deployments to specific users</li>
+        <li>Plugin security advisories — patch promptly</li>
+      </ul>
+    </div>
+
+    <div class="ops-card">
+      <div class="ops-title">📊 Monitoring & Alerts</div>
+      <ul class="ops-list">
+        <li>Slack / Email alerts on build failure</li>
+        <li>Monitor Jenkins metrics via Prometheus plugin</li>
+        <li>Build trend charts — identify flaky tests</li>
+        <li>Disk usage alerts for workspace bloat</li>
+        <li>Jenkins log rotation & cleanup jobs</li>
+      </ul>
+    </div>
+
+    <div class="ops-card">
+      <div class="ops-title">🛠️ Admin & Maintenance</div>
+      <ul class="ops-list">
+        <li>Plugin updates — test in staging first</li>
+        <li>Jenkins version upgrades (LTS track)</li>
+        <li>Add / configure new build agents</li>
+        <li>Manage Jenkins home disk space</li>
+        <li>Periodic <code>$JENKINS_HOME</code> backups</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- SECTION 7: LEARNING ROADMAP -->
+  <div class="section-title">07 — Suggested Learning Roadmap</div>
+  <div class="roadmap">
+    <div class="rm-row">
+      <div class="rm-week">WEEK 1</div>
+      <div class="rm-content"><strong>Foundations</strong> — Install Jenkins, understand architecture, create Freestyle & Declarative pipeline jobs, connect to GitHub via webhook</div>
+    </div>
+    <div class="rm-row">
+      <div class="rm-week">WEEK 2</div>
+      <div class="rm-content"><strong>Pipelines</strong> — Master Jenkinsfile syntax, parallel stages, stash/unstash, environment blocks, post conditions, build parameters</div>
+    </div>
+    <div class="rm-row">
+      <div class="rm-week">WEEK 3</div>
+      <div class="rm-content"><strong>Agents & Docker</strong> — Set up Linux agent via SSH, Docker-in-Docker pipeline, build & push image to DockerHub/ACR, deploy to Azure VM (continue your project!)</div>
+    </div>
+    <div class="rm-row">
+      <div class="rm-week">WEEK 4</div>
+      <div class="rm-content"><strong>Security & Quality</strong> — Credentials management, RBAC, LDAP/AD integration, SonarQube quality gates, audit trail setup</div>
+    </div>
+    <div class="rm-row">
+      <div class="rm-week">WEEK 5–6</div>
+      <div class="rm-content"><strong>Advanced</strong> — Shared Libraries, JCasC, Kubernetes agent plugin, pipeline optimization, HA considerations, Prometheus monitoring</div>
+    </div>
+    <div class="rm-row">
+      <div class="rm-week">ONGOING</div>
+      <div class="rm-content"><strong>Interview Prep</strong> — Practice explaining your Jenkins pipeline project end-to-end; articulate issues faced and how you resolved them (Docker perms, SSH keys, Nginx — you have real stories!)</div>
+    </div>
+  </div>
+
+  <footer>JENKINS MASTERY GUIDE · BUILT FOR RAHUL · DEVOPS LEARNING PATH 2026</footer>
+
+</div>
+</body>
+</html>
