@@ -25,6 +25,11 @@ pipeline {
                 ]) {
                     sh '''
                         sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "ls"
+                        ls 
+                        pwd
+                        git --version
+                        docker --version
+
                     '''
                 }
             }
