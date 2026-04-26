@@ -24,7 +24,9 @@ pipeline {
                     )
                 ]) {
                     sh '''
-                        sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "ls -ltr"             
+                        sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "ls -ltr
+                        hostname
+                        "           
                     '''
                 }
             }
