@@ -17,44 +17,34 @@ pipeline {
             }
         }
 
-        stage('Debug Env') {
-            steps {
-                sh '''
-                echo "ACR_NAME=$ACR_NAME"
-                echo "IMAGE_NAME=$IMAGE_NAME"
-                echo "TAG=$TAG"
-                '''
-            }
-        }
-
         // 🔹 OPTIONAL (Traditional deployment - you can remove later)
-        stage('Deploy to Nginx (Optional)') {
-            steps {
-                withCredentials([
-                    string(credentialsId: 'web-server-ip', variable: 'SERVER_IP'),
-                    usernamePassword(
-                        credentialsId: 'web-server-creds',
-                        usernameVariable: 'USER',
-                        passwordVariable: 'PASS'
-                    )
-                ]) {
-                    sh '''
-                        echo "Cleaning server..."
-                        sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
-                            sudo rm -rf /var/www/html/*
-                        "
+        // stage('Deploy to Nginx (Optional)') {
+        //     steps {
+        //         withCredentials([
+        //             string(credentialsId: 'web-server-ip', variable: 'SERVER_IP'),
+        //             usernamePassword(
+        //                 credentialsId: 'web-server-creds',
+        //                 usernameVariable: 'USER',
+        //                 passwordVariable: 'PASS'
+        //             )
+        //         ]) {
+        //             sh '''
+        //                 echo "Cleaning server..."
+        //                 sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
+        //                     sudo rm -rf /var/www/html/*
+        //                 "
 
-                        echo "Copying file..."
-                        sshpass -p "$PASS" scp -o StrictHostKeyChecking=no Jenkinstopic.html $USER@$SERVER_IP:/var/www/html/index.html
+        //                 echo "Copying file..."
+        //                 sshpass -p "$PASS" scp -o StrictHostKeyChecking=no Jenkinstopic.html $USER@$SERVER_IP:/var/www/html/index.html
 
-                        echo "Reloading nginx..."
-                        sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
-                            sudo systemctl reload nginx
-                        "
-                    '''
-                }
-            }
-        }
+        //                 echo "Reloading nginx..."
+        //                 sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
+        //                     sudo systemctl reload nginx
+        //                 "
+        //             '''
+        //         }
+        //     }
+        // }
 
         stage('Build Image') {
             steps {
@@ -100,33 +90,44 @@ pipeline {
         }
 
         stage('Deploy to VM') {
-    steps {
-        withCredentials([
-            string(credentialsId: 'web-server-ip', variable: 'SERVER_IP'),
-            usernamePassword(
-                credentialsId: 'web-server-creds',
-                usernameVariable: 'USER',
-                passwordVariable: 'PASS'
-            ),
-            azureServicePrincipal(
-                credentialsId: 'jenkins_SP',
-                clientIdVariable: 'AZ_CLIENT_ID',
-                clientSecretVariable: 'AZ_CLIENT_SECRET'
-            )
-        ]) {
-            sh """
-sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP \\
-"echo $AZ_CLIENT_SECRET | docker login jenkinstesting1801.azurecr.io \\
--u $AZ_CLIENT_ID --password-stdin && \\
-docker stop myapp || true && \\
-docker rm myapp || true && \\
-docker pull jenkinstesting1801.azurecr.io/myapp:latest && \\
-docker run -d -p 8081:80 --name myapp jenkinstesting1801.azurecr.io/myapp:latest"
-"""
+            steps {
+                withCredentials([
+                    string(credentialsId: 'web-server-ip', variable: 'SERVER_IP'),
+                    usernamePassword(
+                        credentialsId: 'web-server-creds',
+                        usernameVariable: 'USER',
+                        passwordVariable: 'PASS'
+                    ),
+                    azureServicePrincipal(
+                        credentialsId: 'jenkins_SP',
+                        clientIdVariable: 'AZ_CLIENT_ID',
+                        clientSecretVariable: 'AZ_CLIENT_SECRET'
+                    )
+                ]) {
+                    sh '''
+                        sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP << 'EOF'
+
+                        echo "Login to ACR..."
+                        echo $AZ_CLIENT_SECRET | docker login jenkinstesting1801.azurecr.io \
+                        -u $AZ_CLIENT_ID --password-stdin
+
+                        echo "Stopping old container..."
+                        docker stop myapp || true
+                        docker rm myapp || true
+
+                        echo "Pull latest image..."
+                        docker pull jenkinstesting1801.azurecr.io/myapp:latest
+
+                        echo "Run container..."
+                        docker run -d -p 8081:80 --name myapp jenkinstesting1801.azurecr.io/myapp:latest
+
+                        echo "Deployment completed!"
+
+                        EOF
+                    '''
+                }
+            }
         }
-    }
-}
-    }
 
     post {
         always {
@@ -139,4 +140,6 @@ docker run -d -p 8081:80 --name myapp jenkinstesting1801.azurecr.io/myapp:latest
             echo 'Pipeline Failed ❌'
         }
     }
+    }
 }
+
