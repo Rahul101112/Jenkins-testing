@@ -5,7 +5,7 @@ pipeline{
 
         stage("Build Stage"){
             step(
-                sh"echo hello from Jenkins File"
+                sh(echo hello from Jenkins File)
             
         )
             
