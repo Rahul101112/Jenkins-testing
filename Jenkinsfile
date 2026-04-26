@@ -71,7 +71,7 @@ pipeline {
                 sh 'docker push $ACR_NAME/$IMAGE_NAME:$TAG'
             }
         }
-    }
+    } 
 
     post {
         always {
