@@ -7,11 +7,6 @@ pipeline {
     }
 
     stages {
-        stage('Clean Workspace') {
-            steps {
-                cleanWs()
-            }
-        }
 
        stage('Deploy') {
             steps {
@@ -24,12 +19,14 @@ pipeline {
                     )
                 ]) {
                     sh '''
-                        sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "ls -ltr
-                        hostname
-                        whoami
-                        pwd
-                        ls -lr
-                        sudo apt-get update -y
+                        sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
+                        echo "Inside SSH session"
+                        sudo rm -rf /var/www/html/*
+
+                        sudo systemctl reload nginx
+
+
+                        
                         "           
                     '''
                 }
