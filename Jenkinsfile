@@ -13,6 +13,7 @@ pipeline {
             steps {
                 echo "Running on node: ${env.NODE_NAME}"
                 echo "Workspace: ${env.WORKSPACE}"
+                whoami
                 sh 'hostname'
            }
         }
@@ -50,6 +51,7 @@ pipeline {
 
         stage('Build Image') {
             steps {
+                sh 'whoami'
                 sh 'docker build -t $IMAGE_NAME:$TAG .'
             }
         }
