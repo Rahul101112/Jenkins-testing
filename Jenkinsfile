@@ -23,10 +23,7 @@ pipeline {
                         echo "From SSH session"
                         sudo rm -rf /var/www/html/*
                         sshpass -p "$PASS" scp Jenkinspicto.html $USER@$SERVER_IP:/var/www/html/index.html
-                        sudo systemctl reload nginx
-
-
-                        
+                        sudo systemctl reload nginx                        
                         "           
                     '''
                 }
