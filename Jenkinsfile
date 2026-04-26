@@ -26,6 +26,10 @@ pipeline {
                     sh '''
                         sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "ls -ltr
                         hostname
+                        whoami
+                        pwd
+                        ls -lr
+                        sudo apt get update -y
                         "           
                     '''
                 }
