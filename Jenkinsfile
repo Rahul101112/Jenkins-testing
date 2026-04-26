@@ -1,7 +1,5 @@
 pipeline {
-    agent{
-        label 'jenkins'
-    }
+    agent any
 
      environment {
         ACR_NAME = "jenkinstesting1801.azurecr.io"
