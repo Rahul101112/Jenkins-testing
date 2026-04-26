@@ -51,26 +51,34 @@ pipeline {
 
         stage('Build Image') {
             steps {
-                sh 'whoami'
                 sh 'docker build -t $IMAGE_NAME:$TAG .'
             }
         }
- 
+
         stage('Tag Image') {
             steps {
-                sh 'docker tag $IMAGE_NAME:$TAG $ACR_NAME/$IMAGE_NAME:$TAG'
+                sh 'docker tag $IMAGE_NAME:$TAG $ACR_URL/$IMAGE_NAME:$TAG'
             }
         }
 
         stage('Login to ACR') {
             steps {
-                sh 'az acr login --name $ACR_LOGIN'
+                withCredentials([azureServicePrincipal(
+                    credentialsId: 'jenkins_SP',   // <-- your Jenkins credential ID
+                    clientIdVariable: 'AZ_CLIENT_ID',
+                    clientSecretVariable: 'AZ_CLIENT_SECRET'
+                )]) {
+                    sh '''
+                        echo $AZ_CLIENT_SECRET | docker login $ACR_URL \
+                        -u $AZ_CLIENT_ID --password-stdin
+                    '''
+                }
             }
         }
 
         stage('Push Image') {
             steps {
-                sh 'docker push $ACR_NAME/$IMAGE_NAME:$TAG'
+                sh 'docker push $ACR_URL/$IMAGE_NAME:$TAG'
             }
         }
     } 
