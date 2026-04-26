@@ -55,7 +55,7 @@ pipeline {
                 sh 'docker build -t $IMAGE_NAME:$TAG .'
             }
         }
-
+ 
         stage('Tag Image') {
             steps {
                 sh 'docker tag $IMAGE_NAME:$TAG $ACR_NAME/$IMAGE_NAME:$TAG'
