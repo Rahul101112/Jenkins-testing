@@ -8,14 +8,14 @@ pipeline {
     }
 
     stages {
-        stage('Check Agent') {
-            steps {
-                echo "Running on node: ${env.NODE_NAME}"
-                echo "Workspace: ${env.WORKSPACE}"
-                sh 'whoami'
-                sh 'hostname'
-            }
-        }
+        // stage('Check Agent') {
+        //     steps {
+        //         echo "Running on node: ${env.NODE_NAME}"
+        //         echo "Workspace: ${env.WORKSPACE}"
+        //         sh 'whoami'
+        //         sh 'hostname'
+        //     }
+        // }
 
         // 🔹 OPTIONAL (Traditional deployment - you can remove later)
         // stage('Deploy to Nginx (Optional)') {
@@ -48,13 +48,11 @@ pipeline {
 
         stage('Build Image') {
             steps {
-                sh 'docker build -t $IMAGE_NAME:$TAG .'
-            }
-        }
+                sh '''
+                docker build -t $IMAGE_NAME:$TAG .
+                docker tag $IMAGE_NAME:$TAG $ACR_NAME/$IMAGE_NAME:$TAG
 
-        stage('Tag Image') {
-            steps {
-                sh 'docker tag $IMAGE_NAME:$TAG $ACR_NAME/$IMAGE_NAME:$TAG'
+                '''
             }
         }
 
@@ -105,14 +103,14 @@ pipeline {
             )
         ]) {
                     sh """
-sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP \\
-"echo $AZ_CLIENT_SECRET | docker login jenkinstesting1801.azurecr.io \\
--u $AZ_CLIENT_ID --password-stdin && \\
-docker stop myapp || true && \\
-docker rm myapp || true && \\
-docker pull jenkinstesting1801.azurecr.io/myapp:latest && \\
-docker run -d -p 8081:80 --name myapp jenkinstesting1801.azurecr.io/myapp:latest"
-"""
+                        sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP \\
+                        "echo $AZ_CLIENT_SECRET | docker login jenkinstesting1801.azurecr.io \\
+                        -u $AZ_CLIENT_ID --password-stdin && \\
+                        docker stop myapp || true && \\
+                        docker rm myapp || true && \\
+                        docker pull jenkinstesting1801.azurecr.io/myapp:latest && \\
+                        docker run -d -p 8081:80 --name myapp jenkinstesting1801.azurecr.io/myapp:latest"
+                    """
         }
             }
         }
