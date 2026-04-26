@@ -7,6 +7,14 @@ pipeline {
     }
 
     stages {
+        stage('Check Agent') {
+            steps {
+                echo "Running on node: ${env.NODE_NAME}"
+                echo "Workspace: ${env.WORKSPACE}"
+                sh 'hostname'
+           }
+        }
+
         stage('Deploy') {
             steps {
                 withCredentials([
