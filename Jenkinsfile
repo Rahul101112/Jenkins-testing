@@ -1,21 +1,11 @@
-pipeline{
-    agent any 
-    
-    stages{
+pipeline {
+    agent any
 
-        stage("Build Stage"){
-            step(
-                sh'''
-                
-                echo "hello from Jenkins File"
-
-
-                '''
-            
-        )
-            
+    stages {
+        stage('Build Stage') {
+            steps {
+                echo 'Hello World!'
+            }
         }
     }
-
-    
 }
