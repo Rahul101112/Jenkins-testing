@@ -20,9 +20,9 @@ pipeline {
                 ]) {
                     sh '''
                         sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
-                        echo "Inside SSH session"
+                        echo "From SSH session"
                         sudo rm -rf /var/www/html/*
-
+                        sshpass -p "$PASS" scp Jenkinspicto.html $USER@$SERVER_IP:/var/www/html/index.html
                         sudo systemctl reload nginx
 
 
@@ -48,7 +48,7 @@ pipeline {
 
     post {
         always {
-            echo 'Pipeline finished'
+             archiveArtifacts artifacts: '*.html', fingerprint: true
         }
         success {
             echo 'Success!'
