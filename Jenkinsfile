@@ -29,7 +29,7 @@ pipeline {
                         whoami
                         pwd
                         ls -lr
-                        sudo apt get update -y
+                        sudo apt-get update -y
                         "           
                     '''
                 }
