@@ -1,14 +1,13 @@
 pipeline {
-    agent any   // Where the pipeline will run
+    agent any
 
     environment {
-        SERVER_IP = "your-server-ip"
-        DEPLOY_PATH = "/var/www/html"
+        SERVER_IP = 'your-server-ip'
+        DEPLOY_PATH = '/var/www/html'
     }
 
     stages {
-
-       stage('Deploy') {
+        stage('Deploy') {
             steps {
                 withCredentials([
                     string(credentialsId: 'web-server-ip', variable: 'SERVER_IP'),
@@ -19,12 +18,21 @@ pipeline {
                     )
                 ]) {
                     sh '''
+                        echo "Cleaning server..."
+
                         sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
-                        echo "From SSH session"
-                        sudo rm -rf /var/www/html/*
-                        sshpass -p "$PASS" scp Jenkinspicto.html $USER@$SERVER_IP:/var/www/html/index.html
-                        sudo systemctl reload nginx                        
-                        "           
+                            sudo rm -rf /var/www/html/*
+                        "
+
+                        echo "Copying file..."
+
+                        sshpass -p "$PASS" scp -o StrictHostKeyChecking=no Jenkinstopic.html $USER@$SERVER_IP:/var/www/html/index.html
+
+                        echo "Reloading nginx..."
+
+                        sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
+                            sudo systemctl reload nginx
+                        "
                     '''
                 }
             }
@@ -32,20 +40,20 @@ pipeline {
 
         stage('Build') {
             steps {
-                echo "Building..."
+                echo 'Building...'
             }
         }
 
         stage('Test') {
             steps {
-                echo "Testing..."
+                echo 'Testing...'
             }
         }
     }
 
     post {
         always {
-             archiveArtifacts artifacts: '*.html', fingerprint: true
+            archiveArtifacts artifacts: '*.html', fingerprint: true
         }
         success {
             echo 'Success!'
