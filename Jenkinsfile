@@ -129,17 +129,16 @@ pipeline {
             }
         }
 
-    post {
-        always {
-            archiveArtifacts artifacts: '*.html', fingerprint: true
-        }
-        success {
-            echo 'Image pushed successfully 🚀'
-        }
-        failure {
-            echo 'Pipeline Failed ❌'
-        }
     }
+    post {
+            always {
+                archiveArtifacts artifacts: '*.html', fingerprint: true
+            }
+            success {
+                echo 'Image pushed successfully 🚀'
+            }
+            failure {
+                echo 'Pipeline Failed ❌'
+            }
     }
 }
-
