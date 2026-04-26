@@ -13,7 +13,7 @@ pipeline {
             steps {
                 echo "Running on node: ${env.NODE_NAME}"
                 echo "Workspace: ${env.WORKSPACE}"
-                whoami
+                sh 'whoami'
                 sh 'hostname'
            }
         }
