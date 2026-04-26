@@ -48,6 +48,8 @@ pipeline {
 
         stage('Build Image') {
             steps {
+                echo "Running on node: ${env.NODE_NAME}"
+                echo "Workspace: ${env.WORKSPACE}"
                 sh '''
                 docker build -t $IMAGE_NAME:$TAG .
                 docker tag $IMAGE_NAME:$TAG $ACR_NAME/$IMAGE_NAME:$TAG
