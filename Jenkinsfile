@@ -121,6 +121,54 @@ pipeline {
     post {
         always {
             archiveArtifacts artifacts: '*.html', fingerprint: true
+        emailext(
+            to: 'nahipata2022@gmail.com',
+            subject: "🚀 Deployment: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+            mimeType: 'text/html',
+            body: """
+            <html>
+            <body style="font-family: Arial;">
+
+                <h2 style="color: #2E86C1;">🚀 Jenkins Deployment Notification</h2>
+
+                <p><b>Status:</b> 
+                    <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? 'green' : 'red'};">
+                        ${currentBuild.currentResult}
+                    </span>
+                </p>
+
+                <hr>
+
+                <h3>📦 Build Details</h3>
+                <ul>
+                    <li><b>Job Name:</b> ${env.JOB_NAME}</li>
+                    <li><b>Build Number:</b> ${env.BUILD_NUMBER}</li>
+                    <li><b>Build URL:</b> <a href="${env.BUILD_URL}">Open Build</a></li>
+                </ul>
+
+                <h3>🐳 Docker Info</h3>
+                <ul>
+                    <li><b>Image:</b> ${env.IMAGE_NAME}</li>
+                    <li><b>Tag:</b> ${env.BUILD_NUMBER}</li>
+                </ul>
+
+                <h3>🌐 Application</h3>
+                <p>
+                    Access your app here:<br>
+                    👉 <a href="http://YOUR-SERVER-IP:8081">http://YOUR-SERVER-IP:8081</a>
+                </p>
+
+                <hr>
+
+                <p style="color: gray;">
+                    This is an automated email from Jenkins CI/CD Pipeline.
+                </p>
+
+            </body>
+            </html>
+            """
+        )
+
         }
         success {
             echo 'Image pushed successfully 🚀'
