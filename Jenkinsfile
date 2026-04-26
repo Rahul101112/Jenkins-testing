@@ -1,9 +1,13 @@
 pipeline {
-    agent any
+    agent{
+        label 'jenkins'
+    }
 
-    environment {
-        SERVER_IP = 'your-server-ip'
-        DEPLOY_PATH = '/var/www/html'
+     environment {
+        ACR_NAME = "jenkinstesting1801.azurecr.io"
+        ACR_LOGIN = "jenkinstesting1801"
+        IMAGE_NAME = "myapp"
+        TAG = "v1"
     }
 
     stages {
@@ -46,15 +50,27 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Build Image') {
             steps {
-                echo 'Building...'
+                sh 'docker build -t $IMAGE_NAME:$TAG .'
             }
         }
 
-        stage('Test') {
+        stage('Tag Image') {
             steps {
-                echo 'Testing...'
+                sh 'docker tag $IMAGE_NAME:$TAG $ACR_NAME/$IMAGE_NAME:$TAG'
+            }
+        }
+
+        stage('Login to ACR') {
+            steps {
+                sh 'az acr login --name $ACR_LOGIN'
+            }
+        }
+
+        stage('Push Image') {
+            steps {
+                sh 'docker push $ACR_NAME/$IMAGE_NAME:$TAG'
             }
         }
     }
