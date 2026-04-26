@@ -2,13 +2,12 @@ pipeline {
     agent any
 
     environment {
-        ACR_NAME = "jenkinstesting1801.azurecr.io"
-        IMAGE_NAME = "myapp"
+        ACR_NAME = 'jenkinstesting1801.azurecr.io'
+        IMAGE_NAME = 'myapp'
         TAG = "${env.BUILD_NUMBER}"
     }
 
     stages {
-
         stage('Check Agent') {
             steps {
                 echo "Running on node: ${env.NODE_NAME}"
@@ -101,47 +100,44 @@ pipeline {
         }
 
         stage('Deploy to VM') {
-             steps {
-        withCredentials([
-            string(credentialsId: 'web-server-ip', variable: 'SERVER_IP'),
-            usernamePassword(
-                credentialsId: 'web-server-creds',
-                usernameVariable: 'USER',
-                passwordVariable: 'PASS'
-            ),
-            azureServicePrincipal(
-                credentialsId: 'jenkins_SP',
-                clientIdVariable: 'AZ_CLIENT_ID',
-                clientSecretVariable: 'AZ_CLIENT_SECRET'
-            )
-        ]) {
-            sh '''
-                echo "🚀 Deploying container on server..."
+            steps {
+                withCredentials([
+                    string(credentialsId: 'web-server-ip', variable: 'SERVER_IP'),
+                    usernamePassword(
+                        credentialsId: 'web-server-creds',
+                        usernameVariable: 'USER',
+                        passwordVariable: 'PASS'
+                    ),
+                    azureServicePrincipal(
+                        credentialsId: 'jenkins_SP',
+                        clientIdVariable: 'AZ_CLIENT_ID',
+                        clientSecretVariable: 'AZ_CLIENT_SECRET'
+                    )
+                ]) {
+                    sh '''
+                        sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP << 'EOF'
 
-                sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP << EOF
+                        echo "Stopping old container..."
+                        sudo docker stop myapp || true
+                        sudo docker rm myapp || true
 
-                echo "Stopping old container (if exists)..."
-                docker stop myapp || true
-                docker rm myapp || true
+                        echo "Login to ACR..."
+                        echo $AZ_CLIENT_SECRET | docker login jenkinstesting1801.azurecr.io \
+                        -u $AZ_CLIENT_ID --password-stdin
 
-                echo "Login to ACR..."
-                echo $AZ_CLIENT_SECRET | docker login jenkinstesting1801.azurecr.io \
-                -u $AZ_CLIENT_ID --password-stdin
+                        echo "Pull latest image..."
+                        sudo docker pull jenkinstesting1801.azurecr.io/myapp:latest
 
-                echo "Pull latest image..."
-                docker pull jenkinstesting1801.azurecr.io/myapp:latest
+                        echo "Run container..."
+                        sudo docker run -d -p 80:80 --name myapp jenkinstesting1801.azurecr.io/myapp:latest
 
-                echo "Run new container..."
-                docker run -d -p 80:80 --name myapp jenkinstesting1801.azurecr.io/myapp:latest
+                        echo "Deployment completed!"
 
-                echo "✅ Deployment completed!"
-
-                EOF
-            '''
+                        EOF
+                    '''
+                }
+            }
         }
-    }
-}
-
     }
 
     post {
