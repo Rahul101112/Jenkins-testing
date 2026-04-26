@@ -49,6 +49,17 @@ pipeline {
             }
         }
 
+        stage('Debug Env') {
+          steps {
+                 sh '''
+                   echo "ACR_URL=$ACR_URL"
+                      echo "IMAGE_NAME=$IMAGE_NAME"
+                        echo "TAG=$TAG"
+                  '''
+                 }
+                    }
+
+
         stage('Build Image') {
             steps {
                 sh 'docker build -t $IMAGE_NAME:$TAG .'
@@ -57,7 +68,7 @@ pipeline {
 
         stage('Tag Image') {
             steps {
-                sh 'docker tag $IMAGE_NAME:$TAG $ACR_URL/$IMAGE_NAME:$TAG'
+              sh 'docker tag $IMAGE_NAME:$TAG $ACR_URL/$IMAGE_NAME:$TAG'
             }
         }
 
