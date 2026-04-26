@@ -26,7 +26,7 @@ pipeline {
                     sh '''
                         sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP 
                         "
-                        ls 
+                        ls -ltr
                         pwd
                         git --version
                         hostname                        
