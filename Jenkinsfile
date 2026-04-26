@@ -121,7 +121,7 @@ sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP \\
 docker stop myapp || true && \\
 docker rm myapp || true && \\
 docker pull jenkinstesting1801.azurecr.io/myapp:latest && \\
-docker run -d -p 80:80 --name myapp jenkinstesting1801.azurecr.io/myapp:latest"
+docker run -d -p 8081:80 --name myapp jenkinstesting1801.azurecr.io/myapp:latest"
 """
         }
     }
