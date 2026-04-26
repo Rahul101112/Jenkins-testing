@@ -1,11 +1,45 @@
 pipeline {
-    agent any
+    agent any   // Where the pipeline will run
+
+    environment {
+        NAME = "Rahul"   // Environment variables
+    }
 
     stages {
-        stage('Build Stage') {
+        stage('Clean Workspace') {
             steps {
-                echo 'Hello World!'
+                cleanWs()
             }
+        }
+
+        stage('Build') {
+            steps {
+                echo "Building..."
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo "Testing..."
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo "Deploying..."
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline finished'
+        }
+        success {
+            echo 'Success!'
+        }
+        failure {
+            echo 'Failed!'
         }
     }
 }
