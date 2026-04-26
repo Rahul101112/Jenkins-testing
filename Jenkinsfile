@@ -5,7 +5,7 @@ pipeline {
         ACR_NAME = "jenkinstesting1801.azurecr.io"
         ACR_LOGIN = "jenkinstesting1801"
         IMAGE_NAME = "myapp"
-        TAG = "v1"
+        TAG = ${env.BUILD_NUMBER}
     }
 
     stages {
