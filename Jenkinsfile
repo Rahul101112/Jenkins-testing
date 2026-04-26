@@ -1,24 +1,35 @@
 pipeline {
     agent any
 
-     environment {
+    environment {
         ACR_NAME = "jenkinstesting1801.azurecr.io"
-        ACR_LOGIN = "jenkinstesting1801"
         IMAGE_NAME = "myapp"
         TAG = "${env.BUILD_NUMBER}"
     }
 
     stages {
+
         stage('Check Agent') {
             steps {
                 echo "Running on node: ${env.NODE_NAME}"
                 echo "Workspace: ${env.WORKSPACE}"
                 sh 'whoami'
                 sh 'hostname'
-           }
+            }
         }
 
-        stage('Deploy') {
+        stage('Debug Env') {
+            steps {
+                sh '''
+                echo "ACR_NAME=$ACR_NAME"
+                echo "IMAGE_NAME=$IMAGE_NAME"
+                echo "TAG=$TAG"
+                '''
+            }
+        }
+
+        // 🔹 OPTIONAL (Traditional deployment - you can remove later)
+        stage('Deploy to Nginx (Optional)') {
             steps {
                 withCredentials([
                     string(credentialsId: 'web-server-ip', variable: 'SERVER_IP'),
@@ -30,17 +41,14 @@ pipeline {
                 ]) {
                     sh '''
                         echo "Cleaning server..."
-
                         sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
                             sudo rm -rf /var/www/html/*
                         "
 
                         echo "Copying file..."
-
                         sshpass -p "$PASS" scp -o StrictHostKeyChecking=no Jenkinstopic.html $USER@$SERVER_IP:/var/www/html/index.html
 
                         echo "Reloading nginx..."
-
                         sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
                             sudo systemctl reload nginx
                         "
@@ -48,17 +56,6 @@ pipeline {
                 }
             }
         }
-
-        stage('Debug Env') {
-          steps {
-                 sh '''
-                   echo "ACR_URL=$ACR_URL"
-                      echo "IMAGE_NAME=$IMAGE_NAME"
-                        echo "TAG=$TAG"
-                  '''
-                 }
-                    }
-
 
         stage('Build Image') {
             steps {
@@ -68,19 +65,19 @@ pipeline {
 
         stage('Tag Image') {
             steps {
-              sh 'docker tag $IMAGE_NAME:$TAG $ACR_URL/$IMAGE_NAME:$TAG'
+                sh 'docker tag $IMAGE_NAME:$TAG $ACR_NAME/$IMAGE_NAME:$TAG'
             }
         }
 
         stage('Login to ACR') {
             steps {
                 withCredentials([azureServicePrincipal(
-                    credentialsId: 'jenkins_SP',   // <-- your Jenkins credential ID
+                    credentialsId: 'jenkins_SP',
                     clientIdVariable: 'AZ_CLIENT_ID',
                     clientSecretVariable: 'AZ_CLIENT_SECRET'
                 )]) {
                     sh '''
-                        echo $AZ_CLIENT_SECRET | docker login $ACR_URL \
+                        echo $AZ_CLIENT_SECRET | docker login $ACR_NAME \
                         -u $AZ_CLIENT_ID --password-stdin
                     '''
                 }
@@ -89,20 +86,30 @@ pipeline {
 
         stage('Push Image') {
             steps {
-                sh 'docker push $ACR_URL/$IMAGE_NAME:$TAG'
+                sh 'docker push $ACR_NAME/$IMAGE_NAME:$TAG'
             }
         }
-    } 
+
+        // 🔥 Optional: also tag latest
+        stage('Tag & Push Latest') {
+            steps {
+                sh '''
+                    docker tag $IMAGE_NAME:$TAG $ACR_NAME/$IMAGE_NAME:latest
+                    docker push $ACR_NAME/$IMAGE_NAME:latest
+                '''
+            }
+        }
+    }
 
     post {
         always {
             archiveArtifacts artifacts: '*.html', fingerprint: true
         }
         success {
-            echo 'Success!'
+            echo 'Image pushed successfully 🚀'
         }
         failure {
-            echo 'Failed!'
+            echo 'Pipeline Failed ❌'
         }
     }
 }
