@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        sonarRunner 'sonar-scanner'
-    }
-
     environment {
         ACR_NAME = 'jenkinstesting1801.azurecr.io'
         IMAGE_NAME = 'myapp'
