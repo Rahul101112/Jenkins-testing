@@ -57,7 +57,6 @@ pipeline {
                 sh '''
                 docker build -t $IMAGE_NAME:$TAG .
                 docker tag $IMAGE_NAME:$TAG $ACR_NAME/$IMAGE_NAME:$TAG
-
                 '''
             }
         }
@@ -65,13 +64,15 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh '''
-                        sonar-scanner \
-                        -Dsonar.projectKey=myapp \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=$SONAR_HOST_URL \
-                        -Dsonar.login=$SONAR_AUTH_TOKEN
-                    '''
+                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                        sh '''
+                            sonar-scanner \
+                            -Dsonar.projectKey=myapp \
+                            -Dsonar.sources=. \
+                            -Dsonar.host.url=$SONAR_HOST_URL \
+                            -Dsonar.login=$SONAR_TOKEN
+                        '''
+                    }
                 }
             }
         }
@@ -118,28 +119,28 @@ pipeline {
         stage('Deploy to VM') {
             steps {
                 withCredentials([
-            string(credentialsId: 'web-server-ip', variable: 'SERVER_IP'),
-            usernamePassword(
-                credentialsId: 'web-server-creds',
-                usernameVariable: 'USER',
-                passwordVariable: 'PASS'
-            ),
-            azureServicePrincipal(
-                credentialsId: 'jenkins_SP',
-                clientIdVariable: 'AZ_CLIENT_ID',
-                clientSecretVariable: 'AZ_CLIENT_SECRET'
-            )
-        ]) {
+                    string(credentialsId: 'web-server-ip', variable: 'SERVER_IP'),
+                    usernamePassword(
+                        credentialsId: 'web-server-creds',
+                        usernameVariable: 'USER',
+                        passwordVariable: 'PASS'
+                    ),
+                    azureServicePrincipal(
+                        credentialsId: 'jenkins_SP',
+                        clientIdVariable: 'AZ_CLIENT_ID',
+                        clientSecretVariable: 'AZ_CLIENT_SECRET'
+                    )
+                ]) {
                     sh """
                         sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP \\
-                        "echo $AZ_CLIENT_SECRET | docker login jenkinstesting1801.azurecr.io \\
+                        "echo $AZ_CLIENT_SECRET | docker login $ACR_NAME \\
                         -u $AZ_CLIENT_ID --password-stdin && \\
                         docker stop myapp || true && \\
                         docker rm myapp || true && \\
-                        docker pull jenkinstesting1801.azurecr.io/myapp:latest && \\
-                        docker run -d -p 8081:80 --name myapp jenkinstesting1801.azurecr.io/myapp:latest"
+                        docker pull $ACR_NAME/$IMAGE_NAME:latest && \\
+                        docker run -d -p 8081:80 --name myapp $ACR_NAME/$IMAGE_NAME:latest"
                     """
-        }
+                }
             }
         }
     }
@@ -147,10 +148,10 @@ pipeline {
     post {
         always {
             emailext(
-            to: 'nahipata2022@gmail.com',
-            subject: 'Test Email',
-            body: 'This is a test'
-        )
+                to: 'nahipata2022@gmail.com',
+                subject: "Build ${currentBuild.currentResult}: ${env.JOB_NAME}",
+                body: "Check: ${env.BUILD_URL}"
+            )
         }
         success {
             echo 'Image pushed successfully 🚀'
