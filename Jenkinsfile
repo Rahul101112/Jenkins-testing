@@ -121,7 +121,7 @@ pipeline {
     post {
         always {
         emailext(
-            to: 'your-email@gmail.com',
+            to: 'nahipata2022@gmail.com',
             subject: "Test Email",
             body: "This is a test"
         )
