@@ -18,7 +18,8 @@ Java 17 ✅
 4️⃣ Open PostgreSQL
 sudo -u postgres psql
 
-5️⃣ Run EXACT commands
+5️⃣ Run EXACT commands one by one
+
 CREATE DATABASE sonarqube;
 CREATE USER sonar WITH ENCRYPTED PASSWORD 'sonar';
 ALTER DATABASE sonarqube OWNER TO sonar;
@@ -39,7 +40,9 @@ sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-10.5
 
 
 7️⃣ Extract & Rename
+
 sudo unzip sonarqube-*.zip
+sudo mv sonarqube-10.5.1.90531 sonarqube
 sudo mv sonarqube-* sonarqube
 
 
@@ -53,6 +56,7 @@ sudo chown -R sonar:sonar /opt/sonarqube
 
 
 🚀 PART 4 — Configure SonarQube
+
 🔟 Edit config
 sudo nano /opt/sonarqube/conf/sonar.properties
 

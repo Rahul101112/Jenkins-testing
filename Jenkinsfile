@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+        sonarScanner 'sonar-scanner'
+    }
+
     environment {
         ACR_NAME = 'jenkinstesting1801.azurecr.io'
         IMAGE_NAME = 'myapp'
@@ -55,6 +59,28 @@ pipeline {
                 docker tag $IMAGE_NAME:$TAG $ACR_NAME/$IMAGE_NAME:$TAG
 
                 '''
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh '''
+                        sonar-scanner \
+                        -Dsonar.projectKey=myapp \
+                        -Dsonar.sources=. \
+                        -Dsonar.host.url=$SONAR_HOST_URL \
+                        -Dsonar.login=$SONAR_AUTH_TOKEN
+                    '''
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
             }
         }
 
@@ -120,12 +146,12 @@ pipeline {
 
     post {
         always {
-        emailext(
+            emailext(
             to: 'nahipata2022@gmail.com',
-            subject: "Test Email",
-            body: "This is a test"
+            subject: 'Test Email',
+            body: 'This is a test'
         )
-    }
+        }
         success {
             echo 'Image pushed successfully 🚀'
         }
