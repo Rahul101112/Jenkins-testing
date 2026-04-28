@@ -1,2 +1,2 @@
 FROM nginx:latest
-COPY Jenkinstopic.html /usr/share/nginx/html/index.html
+COPY snake.html /usr/share/nginx/html/index.html
