@@ -8,43 +8,43 @@ pipeline {
     }
 
     stages {
-        // stage('Check Agent') {
-        //     steps {
-        //         echo "Running on node: ${env.NODE_NAME}"
-        //         echo "Workspace: ${env.WORKSPACE}"
-        //         sh 'whoami'
-        //         sh 'hostname'
-        //     }
-        // }
+        stage('Check Agent') {
+            steps {
+                echo "Running on node: ${env.NODE_NAME}"
+                echo "Workspace: ${env.WORKSPACE}"
+                sh 'whoami'
+                sh 'hostname'
+            }
+        }
 
-        // 🔹 OPTIONAL (Traditional deployment - you can remove later)
-        // stage('Deploy to Nginx (Optional)') {
-        //     steps {
-        //         withCredentials([
-        //             string(credentialsId: 'web-server-ip', variable: 'SERVER_IP'),
-        //             usernamePassword(
-        //                 credentialsId: 'web-server-creds',
-        //                 usernameVariable: 'USER',
-        //                 passwordVariable: 'PASS'
-        //             )
-        //         ]) {
-        //             sh '''
-        //                 echo "Cleaning server..."
-        //                 sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
-        //                     sudo rm -rf /var/www/html/*
-        //                 "
+        🔹 OPTIONAL (Traditional deployment - you can remove later)
+        stage('Deploy to Nginx (Optional)') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'web-server-ip', variable: 'SERVER_IP'),
+                    usernamePassword(
+                        credentialsId: 'web-server-creds',
+                        usernameVariable: 'USER',
+                        passwordVariable: 'PASS'
+                    )
+                ]) {
+                    sh '''
+                        echo "Cleaning server..."
+                        sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
+                            sudo rm -rf /var/www/html/*
+                        "
 
-        //                 echo "Copying file..."
-        //                 sshpass -p "$PASS" scp -o StrictHostKeyChecking=no Jenkinstopic.html $USER@$SERVER_IP:/var/www/html/index.html
+                        echo "Copying file..."
+                        sshpass -p "$PASS" scp -o StrictHostKeyChecking=no Jenkinstopic.html $USER@$SERVER_IP:/var/www/html/index.html
 
-        //                 echo "Reloading nginx..."
-        //                 sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
-        //                     sudo systemctl reload nginx
-        //                 "
-        //             '''
-        //         }
-        //     }
-        // }
+                        echo "Reloading nginx..."
+                        sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
+                            sudo systemctl reload nginx
+                        "
+                    '''
+                }
+            }
+        }
 
         stage('Build Image') {
             steps {
