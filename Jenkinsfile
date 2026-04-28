@@ -16,8 +16,7 @@ pipeline {
                 sh 'hostname'
             }
         }
-
-        🔹 OPTIONAL (Traditional deployment - you can remove later)
+        
         stage('Deploy to Nginx (Optional)') {
             steps {
                 withCredentials([
@@ -35,7 +34,7 @@ pipeline {
                         "
 
                         echo "Copying file..."
-                        sshpass -p "$PASS" scp -o StrictHostKeyChecking=no Jenkinstopic.html $USER@$SERVER_IP:/var/www/html/index.html
+                        sshpass -p "$PASS" scp -o StrictHostKeyChecking=no snake.html $USER@$SERVER_IP:/var/www/html/index.html
 
                         echo "Reloading nginx..."
                         sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
