@@ -58,20 +58,20 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                        sh '''
-                            /opt/sonar-scanner/bin/sonar-scanner \
-                            -Dsonar.projectKey=myapp \
-                            -Dsonar.sources=. \
-                            -Dsonar.host.url=$SONAR_HOST_URL \
-                            -Dsonar.login=$SONAR_TOKEN
-                        '''
-                    }
-                }
+    steps {
+        withSonarQubeEnv('SonarQube') {
+            withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                sh '''
+                    /opt/sonar-scanner/bin/sonar-scanner \
+                    -Dsonar.projectKey=myapp \
+                    -Dsonar.sources=. \
+                    -Dsonar.host.url=$SONAR_HOST_URL \
+                    -Dsonar.login=$SONAR_TOKEN
+                '''
             }
         }
+    }
+}
 
         stage('Quality Gate') {
             steps {
