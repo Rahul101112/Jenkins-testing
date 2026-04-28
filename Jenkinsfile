@@ -62,11 +62,6 @@ pipeline {
                 withSonarQubeEnv('SonarQube') {
                     withCredentials([string(credentialsId: 'SoranQubeToken', variable: 'SONAR_TOKEN')]) {
                         sh '''
-                    echo "===== DEBUG START ====="
-                    whoami
-                    pwd
-                    ls -l
-                    echo "PATH=$PATH"
                     /opt/sonar-scanner/bin/sonar-scanner -v
                     echo "===== RUNNING SCAN ====="
 
