@@ -1,40 +1,48 @@
 PART 1 — Fresh Server Setup (Ubuntu)
 1️⃣ Update system
 sudo apt update && sudo apt upgrade -y
+
 2️⃣ Install required packages
 sudo apt install openjdk-17-jdk postgresql postgresql-contrib unzip wget -y
+
 3️⃣ Verify Java (IMPORTANT)
 java -version
 
 👉 Must show:
-
 Java 17 ✅
+
+
+
 🚀 PART 2 — PostgreSQL Setup (Correct Way)
+
 4️⃣ Open PostgreSQL
 sudo -u postgres psql
+
 5️⃣ Run EXACT commands
 CREATE DATABASE sonarqube;
 CREATE USER sonar WITH ENCRYPTED PASSWORD 'sonar';
-
 ALTER DATABASE sonarqube OWNER TO sonar;
 GRANT ALL PRIVILEGES ON DATABASE sonarqube TO sonar;
-
 \c sonarqube
-
 GRANT ALL ON SCHEMA public TO sonar;
 ALTER SCHEMA public OWNER TO sonar;
-
 \q
+
 
 👉 This step prevents your “permission denied” error
 
 🚀 PART 3 — Install SonarQube
 6️⃣ Download
+
 cd /opt
 sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-10.5.1.90531.zip
+
+
 7️⃣ Extract & Rename
 sudo unzip sonarqube-*.zip
 sudo mv sonarqube-* sonarqube
+
+
 8️⃣ Create user
 sudo adduser --system --no-create-home --group --disabled-login sonar
 
@@ -42,16 +50,25 @@ sudo adduser --system --no-create-home --group --disabled-login sonar
 
 9️⃣ Set permissions
 sudo chown -R sonar:sonar /opt/sonarqube
+
+
 🚀 PART 4 — Configure SonarQube
 🔟 Edit config
 sudo nano /opt/sonarqube/conf/sonar.properties
+
+
 
 Add:
 
 sonar.jdbc.username=sonar
 sonar.jdbc.password=sonar
 sonar.jdbc.url=jdbc:postgresql://localhost:5432/sonarqube
+
+
+
 🚀 PART 5 — System Tuning (CRITICAL)
+
+
 1️⃣1️⃣ Edit sysctl
 sudo nano /etc/sysctl.conf
 
@@ -59,27 +76,39 @@ Add at bottom:
 
 vm.max_map_count=262144
 fs.file-max=65536
+
+
 1️⃣2️⃣ Apply
 sudo sysctl -p
 
 👉 Must NOT show error
 
+
 🚀 PART 6 — Start SonarQube
+
+
 1️⃣3️⃣ Start service
 cd /opt/sonarqube/bin/linux-x86-64
 sudo -u sonar ./sonar.sh start
+
+
 1️⃣4️⃣ Check status
 sudo -u sonar ./sonar.sh status
 
 👉 Should show:
 
 SonarQube is running ✅
+
 🚀 PART 7 — Access SonarQube
+
 1️⃣5️⃣ Open in browser
 http://<your-server-ip>:9000
+
+
 🔐 Default login
 Username: admin
 Password: admin
+
 🚪 Open port (Azure)
 
 👉 Add inbound rule:
@@ -96,6 +125,7 @@ SonarQube Scanner Plugin
 👉 SonarQube → My Account → Security
 Create token:
 
+
 jenkins-token
 3️⃣ Add SonarQube in Jenkins
 
@@ -107,7 +137,10 @@ Name: SonarQube
 URL:
 http://<your-server-ip>:9000
 Token → add credential
+
+
 4️⃣ Add in Jenkinsfile
+
 stage('SonarQube Analysis') {
     steps {
         withSonarQubeEnv('SonarQube') {
@@ -121,5 +154,8 @@ stage('SonarQube Analysis') {
         }
     }
 }
+
+
+
 🔥 FINAL RESULT
 Jenkins → Build → SonarQube Analysis → Quality Report → Deploy
