@@ -1,0 +1,16 @@
+AWS EC2 - Root SSH Login & Password Authentication Fix
+
+sudo grep disable_root /etc/cloud/cloud.cfg
+sudo sed -i 's/^disable_root: true/disable_root: false/' /etc/cloud/cloud.cfg
+sudo grep -E "PermitRootLogin|PasswordAuthentication|PubkeyAuthentication" /etc/ssh/sshd_config
+sudo sed -i 's/^#\s*PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+sudo sed -i 's/^#\s*PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+sudo sed -i 's/^#\s*PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+sudo vi /etc/ssh/sshd_config.d/50-cloud-init.conf
+
+
+Change
+
+PasswordAuthentication no  to PasswordAuthentication yes
+
+sudo systemctl restart sshd
