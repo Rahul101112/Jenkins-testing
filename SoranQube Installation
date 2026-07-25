@@ -49,7 +49,7 @@ sudo mv sonarqube-* sonarqube
 8️⃣ Create user
 sudo adduser --system --no-create-home --group --disabled-login sonar
 
-👉 If exists → ignore
+👉 If exists → ignore 
 
 9️⃣ Set permissions
 sudo chown -R sonar:sonar /opt/sonarqube
