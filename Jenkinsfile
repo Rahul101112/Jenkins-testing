@@ -41,7 +41,7 @@ pipeline {
                     rm -rf /var/www/snake-game*
                 "
 
-                echo "Copying snake.html..."
+                echo "Copying snake.html...."
 
                 sshpass -p "$PASS" scp -o StrictHostKeyChecking=no \
                     snake.html \
