@@ -245,7 +245,7 @@
 
 <div id="wrapper">
   <header>
-    <div class="logo">◀ SNEK ▶</div>
+    <div class="logo">◀ SNAKE ▶</div>
     <div class="tagline">EAT. GROW. SURVIVE.</div>
   </header>
 
@@ -269,7 +269,7 @@
 
     <!-- Start screen -->
     <div class="overlay" id="start-screen">
-      <div class="ov-title">SNEK</div>
+      <div class="ov-title">SNAKE</div>
       <div class="ov-sub">USE ARROW KEYS / WASD<br>OR TAP THE D-PAD</div>
       <button class="btn" id="start-btn">▶ START GAME</button>
     </div>
@@ -308,7 +308,7 @@
     // State
     let snake, dir, nextDir, food, score, hiScore, level, speed, loop, paused, alive;
 
-    hiScore = +localStorage.getItem('snekHi') || 0;
+    hiScore = +localStorage.getItem('SNAKEHi') || 0;
     document.getElementById('high-val').textContent = hiScore;
 
     function rand(n) { return Math.floor(Math.random() * n); }
@@ -355,7 +355,7 @@
 
       if (head.x === food.x && head.y === food.y) {
         score += 10 * level;
-        if (score > hiScore) { hiScore = score; localStorage.setItem('snekHi', hiScore); }
+        if (score > hiScore) { hiScore = score; localStorage.setItem('SNAKEHi', hiScore); }
         // Level up every 50 pts
         const newLevel = Math.floor(score / 50) + 1;
         if (newLevel > level) { level = newLevel; speed = Math.max(60, 150 - (level - 1) * 15); }
