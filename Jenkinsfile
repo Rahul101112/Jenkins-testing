@@ -1,18 +1,18 @@
 pipeline {
     agent any
 
-    environment {
-        ACR_NAME = 'jenkinstesting1801.azurecr.io'
-        IMAGE_NAME = 'myapp'
-        TAG = "${env.BUILD_NUMBER}"
-    }
+    // environment {
+    //     ACR_NAME = 'jenkinstesting1801.azurecr.io'
+    //     IMAGE_NAME = 'myapp'
+    //     TAG = "${env.BUILD_NUMBER}"
+    // }
 
     stages {
-        stage('Checkout') {
-    steps {
-        checkout scm
-    }
-}
+        // stage('Checkout') {
+        //     steps {
+        //         checkout scm
+        //     }
+        // }
         stage('Check Agent') {
             steps {
                 // echo "Running on node: ${env.NODE_NAME}"
@@ -31,8 +31,8 @@ pipeline {
                 usernameVariable: 'USER',
                 passwordVariable: 'PASS'
                         )
-                ]) 
-                
+                ])
+
                 {
                     sh '''
                 echo "Cleaning Nginx web directory..."
@@ -129,33 +129,33 @@ pipeline {
         //     }
         // }
 
-        // stage('Deploy to VM') {
-        //     steps {
-        //         withCredentials([
-        //             string(credentialsId: 'web-server-ip', variable: 'SERVER_IP'),
-        //             usernamePassword(
-        //                 credentialsId: 'web-server-creds',
-        //                 usernameVariable: 'USER',
-        //                 passwordVariable: 'PASS'
-        //             ),
-        //             azureServicePrincipal(
-        //                 credentialsId: 'jenkins_SP',
-        //                 clientIdVariable: 'AZ_CLIENT_ID',
-        //                 clientSecretVariable: 'AZ_CLIENT_SECRET'
-        //             )
-        //         ]) {
-        //             sh """
-        //                 sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP \\
-        //                 "echo $AZ_CLIENT_SECRET | docker login $ACR_NAME \\
-        //                 -u $AZ_CLIENT_ID --password-stdin && \\
-        //                 docker stop myapp || true && \\
-        //                 docker rm myapp || true && \\
-        //                 docker pull $ACR_NAME/$IMAGE_NAME:latest && \\
-        //                 docker run -d -p 8081:80 --name myapp $ACR_NAME/$IMAGE_NAME:latest"
-        //             """
-        //         }
-        //     }
-        // }
+    // stage('Deploy to VM') {
+    //     steps {
+    //         withCredentials([
+    //             string(credentialsId: 'web-server-ip', variable: 'SERVER_IP'),
+    //             usernamePassword(
+    //                 credentialsId: 'web-server-creds',
+    //                 usernameVariable: 'USER',
+    //                 passwordVariable: 'PASS'
+    //             ),
+    //             azureServicePrincipal(
+    //                 credentialsId: 'jenkins_SP',
+    //                 clientIdVariable: 'AZ_CLIENT_ID',
+    //                 clientSecretVariable: 'AZ_CLIENT_SECRET'
+    //             )
+    //         ]) {
+    //             sh """
+    //                 sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP \\
+    //                 "echo $AZ_CLIENT_SECRET | docker login $ACR_NAME \\
+    //                 -u $AZ_CLIENT_ID --password-stdin && \\
+    //                 docker stop myapp || true && \\
+    //                 docker rm myapp || true && \\
+    //                 docker pull $ACR_NAME/$IMAGE_NAME:latest && \\
+    //                 docker run -d -p 8081:80 --name myapp $ACR_NAME/$IMAGE_NAME:latest"
+    //             """
+    //         }
+    //     }
+    // }
     }
 
     post {
