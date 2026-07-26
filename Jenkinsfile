@@ -81,7 +81,7 @@ pipeline {
 
                 sshpass -p "$PASS" scp -o StrictHostKeyChecking=no \
                     Terraform_Interview_Q_A.html \
-                    $USER@$SERVER_IP:/var/www/Terraform/Index.html
+                    $USER@$SERVER_IP:/var/www/Terraform/index.html
 
                 echo "Reloading Nginx..."
 
