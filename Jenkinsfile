@@ -45,7 +45,7 @@ pipeline {
 
                 sshpass -p "$PASS" scp -o StrictHostKeyChecking=no \
                     snake.html \
-                    $USER@$SERVER_IP:/var/www/snake-game/
+                    $USER@$SERVER_IP:/var/www/snake-game/index.html
 
                 echo "Reloading Nginx..."
 
