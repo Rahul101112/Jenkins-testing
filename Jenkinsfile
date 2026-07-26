@@ -22,7 +22,7 @@ pipeline {
             }
         }
 
-        stage('Deploy to Nginx') {
+        stage('Deploy to Snake Game To Nginx') {
             steps {
                 withCredentials([
                 string(credentialsId: 'web-server-ip', variable: 'SERVER_IP'),
@@ -46,6 +46,42 @@ pipeline {
                 sshpass -p "$PASS" scp -o StrictHostKeyChecking=no \
                     snake.html \
                     $USER@$SERVER_IP:/var/www/snake/index.html
+
+                echo "Reloading Nginx..."
+
+                sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
+                    sudo systemctl reload nginx
+                "
+                '''
+                }
+            }
+        }
+
+
+                stage('Deploy to Terraform To Nginx') {
+            steps {
+                withCredentials([
+                string(credentialsId: 'web-server-ip', variable: 'SERVER_IP'),
+                usernamePassword(
+                credentialsId: 'web-server-creds',
+                usernameVariable: 'USER',
+                passwordVariable: 'PASS'
+                        )
+                ])
+
+                {
+                    sh '''
+                echo "Cleaning Nginx web directory..."
+
+                sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
+                    rm -rf /var/www/Terraform/*
+                "
+
+                echo "Copying Terraform files...."
+
+                sshpass -p "$PASS" scp -o StrictHostKeyChecking=no \
+                    Terraform_Interview_Q_A.html \
+                    $USER@$SERVER_IP:/var/www/Terraform/Index.html
 
                 echo "Reloading Nginx..."
 
