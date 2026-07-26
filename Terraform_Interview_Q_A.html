@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Terraform Production Scenario Interview Questions</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap');
+
+:root {
+  --bg: #080d14;
+  --bg2: #0d1520;
+  --surface: #111d2e;
+  --card: #0f1a28;
+  --border: #1a2d44;
+  --border2: #243d5a;
+  --accent: #3b82f6;
+  --accent-glow: rgba(59,130,246,0.15);
+  --green: #10b981;
+  --green-glow: rgba(16,185,129,0.12);
+  --orange: #f59e0b;
+  --red: #ef4444;
+  --purple: #8b5cf6;
+  --cyan: #06b6d4;
+  --text: #e2eaf6;
+  --muted: #4a6080;
+  --muted2: #7090b0;
+}
+
+*,*::before,*::after { box-sizing: border-box; margin:0; padding:0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* dot-grid bg */
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background-image: radial-gradient(circle, rgba(59,130,246,0.06) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none; z-index:0;
+}
+
+.wrap { position:relative; z-index:1; max-width: 900px; margin:0 auto; padding: 0 20px 80px; }
+
+/* ── HERO ── */
+.hero {
+  text-align: center;
+  padding: 60px 0 48px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 40px;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(59,130,246,0.1);
+  border: 1px solid rgba(59,130,246,0.2);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 11px; font-weight: 600; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 22px;
+}
+.hero h1 {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800; line-height: 1.15;
+  margin-bottom: 14px;
+}
+.hero h1 .line2 {
+  display: block;
+  background: linear-gradient(90deg, var(--accent), var(--cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-sub {
+  font-size: 14px; color: var(--muted2); max-width: 540px; margin: 0 auto 28px;
+}
+
+/* STATS ROW */
+.stats { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; }
+.stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 20px;
+  text-align: center; min-width: 100px;
+}
+.stat-num { font-size: 22px; font-weight: 800; color: var(--accent); }
+.stat-lbl { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
+
+/* FILTER TABS */
+.filters {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+.filter-btn {
+  padding: 7px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 12px; font-weight: 600;
+  color: var(--muted2);
+  cursor: pointer; transition: all 0.2s;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.filter-btn:hover { border-color: var(--accent); color: var(--text); }
+.filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* SECTION HEADER */
+.section-head {
+  display: flex; align-items: center; gap: 10px;
+  margin: 36px 0 16px;
+  font-size: 11px; font-weight: 700; letter-spacing: 2.5px;
+  text-transform: uppercase; color: var(--muted);
+}
+.section-head::after { content:''; flex:1; height:1px; background: var(--border); }
+
+/* Q&A CARD */
+.qa-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.qa-card:hover { border-color: var(--border2); }
+.qa-card.open {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(59,130,246,0.15), 0 4px 24px rgba(59,130,246,0.08);
+}
+
+.qa-q {
+  padding: 18px 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  user-select: none;
+  transition: background 0.15s;
+}
+.qa-q:hover { background: rgba(59,130,246,0.04); }
+
+.q-num {
+  font-family: 'Fira Code', monospace;
+  font-size: 11px; font-weight: 600;
+  color: var(--accent);
+  background: rgba(59,130,246,0.1);
+  border: 1px solid rgba(59,130,246,0.2);
+  border-radius: 6px;
+  padding: 3px 8px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  min-width: 40px;
+  text-align: center;
+}
+
+.q-body { flex: 1; }
+.q-scenario {
+  font-family: 'Fira Code', monospace;
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 1px; text-transform: uppercase;
+  margin-bottom: 5px;
+}
+.q-text {
+  font-size: 14px; font-weight: 600;
+  color: var(--text); line-height: 1.5;
+}
+
+.q-meta { display: flex; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.diff-badge, .topic-badge {
+  font-size: 10px; font-weight: 600;
+  padding: 2px 8px; border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+.diff-hot { background: rgba(239,68,68,0.1); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
+.diff-mid { background: rgba(245,158,11,0.1); color: var(--orange); border: 1px solid rgba(245,158,11,0.2); }
+.diff-easy { background: rgba(16,185,129,0.1); color: var(--green); border: 1px solid rgba(16,185,129,0.2); }
+.topic-badge { background: rgba(139,92,246,0.1); color: var(--purple); border: 1px solid rgba(139,92,246,0.2); }
+.topic-state { background: rgba(6,182,212,0.1); color: var(--cyan); border: 1px solid rgba(6,182,212,0.2); }
+
+.q-toggle {
+  flex-shrink: 0; margin-top: 2px;
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.qa-card.open .q-toggle {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: rotate(45deg);
+}
+.q-toggle svg { width: 12px; height: 12px; fill: var(--muted2); transition: fill 0.2s; }
+.qa-card.open .q-toggle svg { fill: #fff; }
+
+/* ANSWER */
+.qa-a {
+  display: none;
+  border-top: 1px solid var(--border);
+  animation: slideDown 0.25s ease;
+}
+.qa-card.open .qa-a { display: block; }
+@keyframes slideDown { from { opacity:0; transform: translateY(-6px); } to { opacity:1; transform: translateY(0); } }
+
+.a-inner { padding: 20px; }
+.a-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--green);
+  margin-bottom: 12px; display: flex; align-items: center; gap: 6px;
+}
+.a-label::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--green); flex-shrink:0; }
+
+.a-text {
+  font-size: 13px; color: var(--muted2); line-height: 1.8;
+  margin-bottom: 14px;
+}
+.a-text strong { color: var(--text); font-weight: 600; }
+
+/* Code in answers */
+.a-code {
+  background: #03080f;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 16px 18px;
+  font-family: 'Fira Code', monospace;
+  font-size: 11.5px;
+  line-height: 1.7;
+  color: #c8d8f0;
+  overflow-x: auto;
+  margin-bottom: 14px;
+}
+.a-code::-webkit-scrollbar { height: 3px; }
+.a-code::-webkit-scrollbar-thumb { background: var(--border2); }
+
+/* STEPS */
+.a-steps { list-style: none; margin-bottom: 14px; }
+.a-steps li {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  font-size: 13px; color: var(--muted2);
+  line-height: 1.6;
+}
+.a-steps li:last-child { border-bottom: none; }
+.step-n {
+  width: 20px; height: 20px; border-radius: 6px;
+  background: var(--accent-glow);
+  border: 1px solid rgba(59,130,246,0.25);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Fira Code', monospace;
+  font-size: 9px; font-weight: 700; color: var(--accent);
+  flex-shrink: 0; margin-top: 2px;
+}
+
+/* KEY POINT CHIPS */
+.key-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.chip {
+  font-size: 11px; font-weight: 500;
+  font-family: 'Fira Code', monospace;
+  padding: 4px 10px; border-radius: 6px;
+  background: rgba(59,130,246,0.07);
+  border: 1px solid rgba(59,130,246,0.15);
+  color: var(--accent);
+}
+.chip.green { background: rgba(16,185,129,0.07); border-color: rgba(16,185,129,0.15); color: var(--green); }
+.chip.red { background: rgba(239,68,68,0.07); border-color: rgba(239,68,68,0.15); color: var(--red); }
+.chip.orange { background: rgba(245,158,11,0.07); border-color: rgba(245,158,11,0.15); color: var(--orange); }
+
+/* PRO TIP */
+.pro-tip {
+  display: flex; gap: 10px;
+  background: rgba(245,158,11,0.05);
+  border: 1px solid rgba(245,158,11,0.15);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 12px; color: #a07030;
+  margin-top: 14px; line-height: 1.6;
+}
+.pro-tip::before { content:'💡'; flex-shrink:0; }
+
+/* EXPAND ALL */
+.top-actions { display: flex; justify-content: flex-end; margin-bottom: 20px; gap: 8px; }
+.action-btn {
+  padding: 7px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 12px; font-weight: 600;
+  color: var(--muted2); cursor: pointer;
+  transition: all 0.15s;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.action-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* highlight code syntax */
+.kw { color: #f472b6; }
+.str { color: #fde047; }
+.cmt { color: #3d5a75; font-style: italic; }
+.fn { color: #4ade80; }
+.val { color: #c084fc; }
+.var { color: #fb923c; }
+.attr { color: #93c5fd; }
+
+@media (max-width: 600px) {
+  .hero h1 { font-size: 1.6rem; }
+  .stats { gap: 12px; }
+  .q-text { font-size: 13px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">🔥 Real Production Scenarios</div>
+  <h1>Terraform Interview<span class="line2">Production War Stories</span></h1>
+  <p class="hero-sub">Real-world production issues faced by DevOps & Cloud engineers — scenario-based questions that separate juniors from seniors.</p>
+  <div class="stats">
+    <div class="stat"><div class="stat-num">25</div><div class="stat-lbl">Questions</div></div>
+    <div class="stat"><div class="stat-num">8</div><div class="stat-lbl">Categories</div></div>
+    <div class="stat"><div class="stat-num">Azure</div><div class="stat-lbl">Focus</div></div>
+    <div class="stat"><div class="stat-num">Prod</div><div class="stat-lbl">Level</div></div>
+  </div>
+</div>
+
+<!-- FILTERS -->
+<div class="filters">
+  <button class="filter-btn active" onclick="filterCards('all', this)">All (25)</button>
+  <button class="filter-btn" onclick="filterCards('state', this)">🗄️ State</button>
+  <button class="filter-btn" onclick="filterCards('drift', this)">📡 Drift</button>
+  <button class="filter-btn" onclick="filterCards('cicd', this)">⚙️ CI/CD</button>
+  <button class="filter-btn" onclick="filterCards('secrets', this)">🔐 Secrets</button>
+  <button class="filter-btn" onclick="filterCards('modules', this)">📦 Modules</button>
+  <button class="filter-btn" onclick="filterCards('destroy', this)">💣 Accidental Destroy</button>
+  <button class="filter-btn" onclick="filterCards('refactor', this)">🔄 Refactor</button>
+  <button class="filter-btn" onclick="filterCards('perf', this)">🚀 Performance</button>
+</div>
+
+<div class="top-actions">
+  <button class="action-btn" onclick="toggleAll(true)">Expand All</button>
+  <button class="action-btn" onclick="toggleAll(false)">Collapse All</button>
+</div>
+
+<!-- ══════════════════════════ STATE ISSUES ══════════════════════════ -->
+<div class="section-head">🗄️ State & Locking Issues</div>
+
+<!-- Q1 -->
+<div class="qa-card" data-tag="state">
+  <div class="qa-q" onclick="toggle(this)">
+    <div class="q-num">Q01</div>
+    <div class="q-body">
+      <div class="q-scenario" style="color:#06b6d4">State · Production Incident</div>
+      <div class="q-text">Your CI/CD pipeline runs <code>terraform apply</code> and gets: <em>"Error acquiring the state lock. Lock Info: ID: xxx"</em> — but no one is currently running Terraform. How do you resolve this in production?</div>
+      <div class="q-meta">
+        <span class="diff-badge diff-hot">🔥 Hot Topic</span>
+        <span class="topic-badge topic-state">State Lock</span>
+      </div>
+    </div>
+    <div class="q-toggle"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></div>
+  </div>
+  <div class="qa-a"><div class="a-inner">
+    <div class="a-label">Answer</div>
+    <div class="a-text">This happens when a previous Terraform run was <strong>killed mid-flight</strong> (pipeline timeout, OOM, manual Ctrl+C) and did not release the lock. The lock record stays in the backend.</div>
+    <ul class="a-steps">
+      <li><span class="step-n">1</span><span><strong>Identify the stale lock ID</strong> from the error message — it shows the Lock ID, Who, and When it was acquired.</span></li>
+      <li><span class="step-n">2</span><span>Verify no active apply is running: check your CI/CD platform for any active jobs.</span></li>
+      <li><span class="step-n">3</span><span>For Azure backend: the lock is a blob lease on the state file in Storage Account. You can break the lease via Azure Portal → Storage → Blob → Break Lease, OR use the Terraform command.</span></li>
+      <li><span class="step-n">4</span><span>Run force-unlock with the Lock ID shown in the error.</span></li>
+    </ul>
+    <div class="a-code"><span class="cmt"># Force unlock using the Lock ID from the error output</span>
+terraform force-unlock LOCK_ID_FROM_ERROR
+
+<span class="cmt"># For Azure: you can also break the blob lease directly</span>
+az storage blob lease break \
+  --blob-name prod.terraform.tfstate \
+  --container-name tfstate \
+  --account-name sttfstate001</div>
+    <div class="pro-tip"><strong>Pro tip:</strong> In Azure DevOps pipelines, always set a <code>cancel</code> job step to run <code>terraform force-unlock</code> if the pipeline is cancelled. Never use <code>-lock=false</code> in production — it bypasses protection entirely.</div>
+    <div class="key-chips">
+      <span class="chip">force-unlock</span>
+      <span class="chip green">Azure blob lease</span>
+      <span class="chip red">Never -lock=false in prod</span>
+    </div>
+  </div></div>
+</div>
+
+<!-- Q2 -->
+<div class="qa-card" data-tag="state">
+  <div class="qa-q" onclick="toggle(this)">
+    <div class="q-num">Q02</div>
+    <div class="q-body">
+      <div class="q-scenario" style="color:#06b6d4">State · Corruption</div>
+      <div class="q-text">Your production state file got corrupted — <code>terraform plan</code> throws a JSON parse error. The application is still running. How do you recover without destroying infra?</div>
+      <div class="q-meta"><span class="diff-badge diff-hot">🔥 Critical</span><span class="topic-badge topic-state">State Recovery</span></div>
+    </div>
+    <div class="q-toggle"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></div>
+  </div>
+  <div class="qa-a"><div class="a-inner">
+    <div class="a-label">Answer</div>
+    <div class="a-text">State file corruption is one of the most stressful production incidents. The recovery approach depends on whether you have <strong>versioned backups</strong> — which is why enabling versioning on your Azure Storage Account is non-negotiable.</div>
+    <ul class="a-steps">
+      <li><span class="step-n">1</span><span><strong>Do NOT run terraform apply.</strong> First, pull a copy of the corrupted state for analysis: <code>terraform state pull > corrupted.tfstate</code></span></li>
+      <li><span class="step-n">2</span><span><strong>Check Azure Storage versioning</strong> — go to the blob in Azure Portal, click "View versions" and restore the last known good version.</span></li>
+      <li><span class="step-n">3</span><span>If no versioning, use <code>terraform import</code> to rebuild state resource by resource from existing Azure infrastructure.</span></li>
+      <li><span class="step-n">4</span><span>After restoring, run <code>terraform plan</code> — it should show only minor diffs, not mass destruction.</span></li>
+      <li><span class="step-n">5</span><span>Going forward: enable blob versioning, implement daily state backups, use <code>terraform state pull</code> snapshots in CI.</span></li>
+    </ul>
+    <div class="a-code"><span class="cmt"># Pull current (corrupted) state</span>
+terraform state pull > backup_corrupted.tfstate
+
+<span class="cmt"># Restore previous version (Azure CLI)</span>
+az storage blob copy start \
+  --source-container tfstate \
+  --source-blob "prod.tfstate?versionid=2024-01-01T10:00:00.000Z" \
+  --destination-container tfstate \
+  --destination-blob prod.terraform.tfstate
+
+<span class="cmt"># Verify plan looks sane after restore</span>
+terraform plan</div>
+    <div class="pro-tip"><strong>Prevention:</strong> Always configure Azure Storage with <code>versioning_enabled = true</code> and <code>blob_soft_delete_enabled = true</code> via Terraform itself.</div>
+  </div></div>
+</div>
+
+<!-- Q3 -->
+<div class="qa-card" data-tag="state">
+  <div class="qa-q" onclick="toggle(this)">
+    <div class="q-num">Q03</div>
+    <div class="q-body">
+      <div class="q-scenario" style="color:#06b6d4">State · Concurrent Apply</div>
+      <div class="q-text">Two developers push to main branch simultaneously. Both pipelines trigger <code>terraform apply</code> at the same time against the same state backend. What happens and how do you prevent it?</div>
+      <div class="q-meta"><span class="diff-badge diff-mid">⚠️ Medium</span><span class="topic-badge topic-state">Concurrency</span></div>
+    </div>
+    <div class="q-toggle"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></div>
+  </div>
+  <div class="qa-a"><div class="a-inner">
+    <div class="a-label">Answer</div>
+    <div class="a-text"><strong>What happens:</strong> The first pipeline acquires the state lock. The second pipeline will <strong>block and wait</strong> (up to the lock timeout), then fail with "Error acquiring the state lock" — which is the correct behaviour. However, if both somehow apply, you risk state corruption and resource inconsistency.</div>
+    <div class="a-text"><strong>Correct solution:</strong> Prevent two applies from ever running simultaneously using pipeline-level concurrency controls.</div>
+    <div class="a-code"><span class="cmt"># Azure DevOps — use pipeline resource locking</span>
+<span class="cmt"># In azure-pipelines.yml:</span>
+lockBehavior: sequential   <span class="cmt"># queue applies instead of parallel</span>
+
+<span class="cmt"># GitHub Actions — use concurrency groups</span>
+concurrency:
+  group: terraform-prod
+  cancel-in-progress: false   <span class="cmt"># queue, don't cancel</span>
+
+<span class="cmt"># Azure backend also provides blob-level locking automatically</span>
+<span class="kw">terraform</span> {
+  backend <span class="str">"azurerm"</span> {
+    <span class="attr">resource_group_name</span>  = <span class="str">"rg-tfstate"</span>
+    <span class="attr">storage_account_name</span> = <span class="str">"sttfstate001"</span>
+    <span class="attr">container_name</span>       = <span class="str">"tfstate"</span>
+    <span class="attr">key</span>                  = <span class="str">"prod.tfstate"</span>
+    <span class="cmt"># Azure blob leases provide automatic state locking</span>
+  }
+}</div>
+    <div class="key-chips">
+      <span class="chip">pipeline concurrency</span>
+      <span class="chip green">blob lease locking</span>
+      <span class="chip orange">sequential queue</span>
+    </div>
+  </div></div>
+</div>
+
+<!-- ══════════════════════════ DRIFT ══════════════════════════ -->
+<div class="section-head">📡 Infrastructure Drift Scenarios</div>
+
+<!-- Q4 -->
+<div class="qa-card" data-tag="drift">
+  <div class="qa-q" onclick="toggle(this)">
+    <div class="q-num">Q04</div>
+    <div class="q-body">
+      <div class="q-scenario" style="color:#f59e0b">Drift · Emergency Fix</div>
+      <div class="q-text">A junior engineer manually opened port 22 on a production NSG in the Azure Portal during an incident (bypassing Terraform). The next CI pipeline <code>terraform apply</code> will revert that change automatically. How do you handle this?</div>
+      <div class="q-meta"><span class="diff-badge diff-hot">🔥 Real World</span><span class="topic-badge">Drift</span></div>
+    </div>
+    <div class="q-toggle"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></div>
+  </div>
+  <div class="qa-a"><div class="a-inner">
+    <div class="a-label">Answer</div>
+    <div class="a-text">This is a classic <strong>infrastructure drift</strong> scenario. You have two choices depending on whether the manual change should be permanent or temporary.</div>
+    <ul class="a-steps">
+      <li><span class="step-n">1</span><span><strong>Run terraform plan</strong> immediately — it will show the drift (port 22 rule as "to be deleted"). This confirms what Terraform sees.</span></li>
+      <li><span class="step-n">2</span><span><strong>If the rule must stay:</strong> Update the Terraform code to include the port 22 rule. This makes it permanent and code-tracked. Commit and push.</span></li>
+      <li><span class="step-n">3</span><span><strong>If temporary (incident only):</strong> Add <code>ignore_changes</code> for NSG rules until the incident is resolved, then remove it and revert via Terraform.</span></li>
+      <li><span class="step-n">4</span><span><strong>Long-term fix:</strong> Lock the NSG resource in Azure Portal so manual edits are blocked. Enforce IaC-only changes via Azure Policy.</span></li>
+    </ul>
+    <div class="a-code"><span class="cmt"># Option A: Add the change to Terraform code (recommended)</span>
+<span class="kw">resource</span> <span class="str">"azurerm_network_security_rule"</span> <span class="str">"allow_ssh_temp"</span> {
+  <span class="attr">name</span>                        = <span class="str">"allow-ssh-incident"</span>
+  <span class="attr">priority</span>                    = <span class="val">150</span>
+  <span class="attr">direction</span>                   = <span class="str">"Inbound"</span>
+  <span class="attr">access</span>                      = <span class="str">"Allow"</span>
+  <span class="attr">protocol</span>                    = <span class="str">"Tcp"</span>
+  <span class="attr">destination_port_range</span>      = <span class="str">"22"</span>
+  <span class="attr">source_address_prefix</span>       = <span class="str">"10.0.0.0/8"</span>  <span class="cmt"># restrict to internal</span>
+  <span class="attr">network_security_group_name</span> = <span class="var">var</span>.nsg_name
+  <span class="attr">resource_group_name</span>         = <span class="var">var</span>.rg_name
+}
+
+<span class="cmt"># Option B: Temporarily ignore changes on NSG</span>
+<span class="kw">resource</span> <span class="str">"azurerm_network_security_group"</span> <span class="str">"nsg"</span> {
+  <span class="attr">lifecycle</span> {
+    <span class="attr">ignore_changes</span> = [<span class="attr">security_rule</span>]  <span class="cmt"># TEMPORARY — remove after incident</span>
+  }
+}</div>
+    <div class="pro-tip"><strong>Best practice:</strong> Set up <strong>drift detection</strong> as a scheduled pipeline job that runs <code>terraform plan</code> daily and alerts on any unexpected diffs. Treat drift as an incident.</div>
+  </div></div>
+</div>
+
+<!-- Q5 -->
+<div class="qa-card" data-tag="drift">
+  <div class="qa-q" onclick="toggle(this)">
+    <div class="q-num">Q05</div>
+    <div class="q-body">
+      <div class="q-scenario" style="color:#f59e0b">Drift · Detection</div>
+      <div class="q-text">How would you set up automated drift detection in production so you know when someone makes manual changes in the Azure Portal?</div>
+      <div class="q-meta"><span class="diff-badge diff-mid">⚠️ Medium</span><span class="topic-badge">Drift Detection</span></div>
+    </div>
+    <div class="q-toggle"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></div>
+  </div>
+  <div class="qa-a"><div class="a-inner">
+    <div class="a-label">Answer</div>
+    <div class="a-text">Drift detection is a scheduled pipeline that runs <code>terraform plan</code> in <strong>read-only mode</strong> without applying changes. Any non-empty plan output means drift has occurred.</div>
+    <div class="a-code"><span class="cmt"># Azure DevOps — scheduled drift detection pipeline (YAML)</span>
+schedules:
+  - cron: <span class="str">"0 7 * * *"</span>          <span class="cmt"># Every day at 7 AM IST</span>
+    displayName: Drift Detection
+    branches:
+      include: [main]
+    always: true
+
+steps:
+  - script: terraform init
+  - script: |
+      terraform plan -detailed-exitcode -out drift.tfplan 2>&1
+      exit_code=$?
+      if [ $exit_code -eq 2 ]; then
+        echo "##vso[task.logissue type=error]DRIFT DETECTED!"
+        exit 1    <span class="cmt"># fail pipeline → triggers alert</span>
+      fi
+    displayName: Detect Drift
+
+<span class="cmt"># -detailed-exitcode: 0=no diff, 1=error, 2=diff found</span>
+<span class="cmt"># Pair with Azure Monitor alert on pipeline failure → Teams/Slack notification</span></div>
+    <div class="key-chips">
+      <span class="chip">-detailed-exitcode</span>
+      <span class="chip green">scheduled pipeline</span>
+      <span class="chip orange">Teams/Slack alert</span>
+    </div>
+  </div></div>
+</div>
+
+<!-- ══════════════════════════ ACCIDENTAL DESTROY ══════════════════════════ -->
+<div class="section-head">💣 Accidental Destroy & Protection</div>
+
+<!-- Q6 -->
+<div class="qa-card" data-tag="destroy">
+  <div class="qa-q" onclick="toggle(this)">
+    <div class="q-num">Q06</div>
+    <div class="q-body">
+      <div class="q-scenario" style="color:#ef4444">Destroy · Production Database</div>
+      <div class="q-text">A developer renamed a Terraform resource block for a production Azure SQL database. The next <code>terraform plan</code> shows the old DB will be <strong>DESTROYED</strong> and a new one created. How do you prevent data loss?</div>
+      <div class="q-meta"><span class="diff-badge diff-hot">🔥 Critical</span><span class="topic-badge">prevent_destroy</span></div>
+    </div>
+    <div class="q-toggle"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></div>
+  </div>
+  <div class="qa-a"><div class="a-inner">
+    <div class="a-label">Answer</div>
+    <div class="a-text">This is caused by the <strong>resource address changing</strong> — Terraform treats a rename as destroy-and-create. You need to update the state reference, not recreate the resource. Two complementary solutions:</div>
+    <ul class="a-steps">
+      <li><span class="step-n">1</span><span><strong>Immediate fix:</strong> Use <code>terraform state mv</code> to rename the state reference to match the new name. No infra is touched.</span></li>
+      <li><span class="step-n">2</span><span><strong>Or use a <code>moved</code> block</strong> (TF 1.1+) — declarative, reviewable in PR, cleaner.</span></li>
+      <li><span class="step-n">3</span><span><strong>Prevention:</strong> Add <code>prevent_destroy = true</code> in the lifecycle block of all production databases.</span></li>
+      <li><span class="step-n">4</span><span><strong>CI gate:</strong> Add a policy check in your pipeline that fails if the plan contains any resource destruction of critical resource types.</span></li>
+    </ul>
+    <div class="a-code"><span class="cmt"># Fix 1: state mv — no infra change, just state rename</span>
+terraform state mv \
+  azurerm_mssql_database.old_name \
+  azurerm_mssql_database.new_name
+
+<span class="cmt"># Fix 2: moved block in your .tf code (preferred)</span>
+<span class="kw">moved</span> {
+  from = <span class="attr">azurerm_mssql_database</span>.old_name
+  to   = <span class="attr">azurerm_mssql_database</span>.new_name
+}
+
+<span class="cmt"># Prevention: lifecycle guard on all prod databases</span>
+<span class="kw">resource</span> <span class="str">"azurerm_mssql_database"</span> <span class="str">"prod_db"</span> {
+  <span class="attr">name</span>      = <span class="str">"sqldb-prod"</span>
+  <span class="attr">server_id</span> = <span class="var">var</span>.sql_server_id
+  <span class="attr">lifecycle</span> {
+    <span class="attr">prevent_destroy</span> = <span class="val">true</span>
+  }
+}</div>
+    <div class="pro-tip"><strong>CI gate script:</strong> Run <code>terraform show -json drift.tfplan | jq '[.resource_changes[] | select(.change.actions[] == "delete")]'</code> and fail the pipeline if any critical resources appear in the destroy list.</div>
+  </div></div>
+</div>
+
+<!-- Q7 -->
+<div class="qa-card" data-tag="destroy">
+  <div class="qa-q" onclick="toggle(this)">
+    <div class="q-num">Q07</div>
+    <div class="q-body">
+      <div class="q-scenario" style="color:#ef4444">Destroy · Runaway</div>
+      <div class="q-text">Someone accidentally ran <code>terraform destroy</code> on a production environment and it deleted 30+ resources before you stopped it. How do you recover?</div>
+      <div class="q-meta"><span class="diff-badge diff-hot">🔥 Nightmare Scenario</span><span class="topic-badge">Disaster Recovery</span></div>
+    </div>
+    <div class="q-toggle"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></div>
+  </div>
+  <div class="qa-a"><div class="a-inner">
+    <div class="a-label">Answer</div>
+    <div class="a-text">This is a major incident. First: <strong>stay calm and stop further destruction</strong>. Then follow this recovery playbook:</div>
+    <ul class="a-steps">
+      <li><span class="step-n">1</span><span><strong>Stop the destroy</strong> — Ctrl+C immediately if still running. Check state to see what remains.</span></li>
+      <li><span class="step-n">2</span><span><strong>Check Azure soft-delete / snapshots</strong> — Many Azure resources (VMs, Storage, Key Vault, SQL) have soft-delete or point-in-time restore. Use Azure Portal to recover them first.</span></li>
+      <li><span class="step-n">3</span><span><strong>Restore state</strong> — Pull the last good state from Azure Storage blob version history. Without state, Terraform won't know these resources existed.</span></li>
+      <li><span class="step-n">4</span><span><strong>Import recovered resources</strong> — For any resources you restored manually, use <code>terraform import</code> to re-link them to the state.</span></li>
+      <li><span class="step-n">5</span><span><strong>Run terraform apply</strong> (not destroy) — with the restored state, Terraform will recreate any still-missing resources.</span></li>
+      <li><span class="step-n">6</span><span><strong>Post-incident:</strong> Add <code>prevent_destroy</code>, restrict who can run <code>terraform destroy</code>, require manual approval in pipelines.</span></li>
+    </ul>
+    <div class="a-code"><span class="cmt"># Restore state from Azure blob versioning</span>
+az storage blob list-versions \
+  --container-name tfstate \
+  --name prod.terraform.tfstate \
+  --account-name sttfstate001
+
+<span class="cmt"># Recover a soft-deleted Azure Key Vault</span>
+az keyvault recover --name kv-prod-001
+
+<span class="cmt"># Import a recovered resource back into state</span>
+terraform import azurerm_resource_group.main \
+  /subscriptions/&lt;id&gt;/resourceGroups/rg-prod</div>
+    <div class="pro-tip"><strong>Prevention:</strong> In Azure DevOps, create a separate pipeline for destroy that requires 2 approvals from team leads. Never run <code>terraform destroy</code> from a developer's local machine on prod.</div>
+  </div></div>
+</div>
+
+<!-- ══════════════════════════ REFACTORING ══════════════════════════ -->
+<div class="section-head">🔄 Refactoring Without Downtime</div>
+
+<!-- Q8 -->
+<div class="qa-card" data-tag="refactor">
+  <div class="qa-q" onclick="toggle(this)">
+    <div class="q-num">Q08</div>
+    <div class="q-body">
+      <div class="q-scenario" style="color:#8b5cf6">Refactor · count → for_each</div>
+      <div class="q-text">You have 5 Azure VMs created with <code>count</code>. You need to migrate to <code>for_each</code> without recreating any VMs. What is your approach?</div>
+      <div class="q-meta"><span class="diff-badge diff-hot">🔥 Common Trap</span><span class="topic-badge">Refactor</span></div>
+    </div>
+    <div class="q-toggle"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></div>
+  </div>
+  <div class="qa-a"><div class="a-inner">
+    <div class="a-label">Answer</div>
+    <div class="a-text">Changing from <code>count</code> to <code>for_each</code> changes the resource <strong>address</strong> in state (from <code>vm[0]</code> to <code>vm["name"]</code>), which Terraform reads as destroy-and-recreate. You must use <code>terraform state mv</code> or <code>moved</code> blocks to map old addresses to new ones.</div>
+    <div class="a-code"><span class="cmt"># OLD code (count-based) — addresses are vm[0], vm[1]...</span>
+<span class="kw">resource</span> <span class="str">"azurerm_linux_virtual_machine"</span> <span class="str">"vm"</span> {
+  <span class="attr">count</span> = <span class="fn">length</span>(<span class="var">var</span>.vm_names)
+  <span class="attr">name</span>  = <span class="var">var</span>.vm_names[<span class="var">count</span>.index]
+}
+
+<span class="cmt"># NEW code (for_each-based)</span>
+<span class="kw">resource</span> <span class="str">"azurerm_linux_virtual_machine"</span> <span class="str">"vm"</span> {
+  <span class="attr">for_each</span> = <span class="fn">toset</span>(<span class="var">var</span>.vm_names)
+  <span class="attr">name</span>     = <span class="var">each</span>.key
+}
+
+<span class="cmt"># MIGRATION: Add moved blocks (one per VM)</span>
+<span class="kw">moved</span> {
+  from = <span class="attr">azurerm_linux_virtual_machine</span>.vm[0]
+  to   = <span class="attr">azurerm_linux_virtual_machine</span>.vm[<span class="str">"vm-app-01"</span>]
+}
+<span class="kw">moved</span> {
+  from = <span class="attr">azurerm_linux_virtual_machine</span>.vm[1]
+  to   = <span class="attr">azurerm_linux_virtual_machine</span>.vm[<span class="str">"vm-app-02"</span>]
+}
+<span class="cmt"># terraform plan → should show "moved" not "destroyed"</span></div>
+    <div class="pro-tip"><strong>Always run plan first</strong> after adding moved blocks. If the plan shows zero destroy actions and only move operations, you are safe to apply.</div>
+  </div></div>
+</div>
+
+<!-- Q9 -->
+<div class="qa-card" data-tag="refactor">
+  <div class="qa-q" onclick="toggle(this)">
+    <div class="q-num">Q09</div>
+    <div class="q-body">
+      <div class="q-scenario" style="color:#8b5cf6">Refactor · Module Extraction</div>
+      <div class="q-text">You want to extract inline resources into a reusable module without destroying and recreating the existing Azure infrastructure. How do you safely do this?</div>
+      <div class="q-meta"><span class="diff-badge diff-mid">⚠️ Medium</span><span class="topic-badge">Modules</span></div>
+    </div>
+    <div class="q-toggle"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></div>
+  </div>
+  <div class="qa-a"><div class="a-inner">
+    <div class="a-label">Answer</div>
+    <div class="a-text">When you move a resource into a module, the state address changes from <code>azurerm_virtual_network.vnet</code> to <code>module.network.azurerm_virtual_network.vnet</code>. Terraform sees this as a new resource. Use a <code>moved</code> block to tell it the addresses are the same physical resource.</div>
+    <div class="a-code"><span class="cmt"># Before: inline resource</span>
+<span class="kw">resource</span> <span class="str">"azurerm_virtual_network"</span> <span class="str">"vnet"</span> { ... }
+
+<span class="cmt"># After: in a module</span>
+<span class="kw">module</span> <span class="str">"network"</span> {
+  source = <span class="str">"./modules/network"</span>
+  <span class="attr">name</span>   = <span class="str">"vnet-prod"</span>
+}
+
+<span class="cmt"># Bridge: moved block in root</span>
+<span class="kw">moved</span> {
+  from = <span class="attr">azurerm_virtual_network</span>.vnet
+  to   = <span class="fn">module</span>.network.<span class="attr">azurerm_virtual_network</span>.this
+}
+
+<span class="cmt"># Result: terraform plan shows "moved" — zero recreation</span></div>
+    <div class="key-chips">
+      <span class="chip">moved block</span>
+      <span class="chip green">zero downtime</span>
+      <span class="chip">state address change</span>
+    </div>
+  </div></div>
+</div>
+
+<!-- ══════════════════════════ SECRETS ══════════════════════════ -->
+<div class="section-head">🔐 Secrets & Security</div>
+
+<!-- Q10 -->
+<div class="qa-card" data-tag="secrets">
+  <div class="qa-q" onclick="toggle(this)">
+    <div class="q-num">Q10</div>
+    <div class="q-body">
+      <div class="q-scenario" style="color:#10b981">Secrets · Leak</div>
+      <div class="q-text">A developer committed a <code>terraform.tfvars</code> file containing database passwords to Git. The secret is now in history. What are your immediate steps and long-term fixes?</div>
+      <div class="q-meta"><span class="diff-badge diff-hot">🔥 Security Incident</span><span class="topic-badge">Secrets</span></div>
+    </div>
+    <div class="q-toggle"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></div>
+  </div>
+  <div class="qa-a"><div class="a-inner">
+    <div class="a-label">Answer</div>
+    <div class="a-text">This is a <strong>security incident</strong>. Treat the secret as compromised the moment it was committed — even if the repo is private.</div>
+    <ul class="a-steps">
+      <li><span class="step-n">1</span><span><strong>Immediately rotate the secret</strong> — change the DB password in Azure right now. The old one is compromised.</span></li>
+      <li><span class="step-n">2</span><span><strong>Remove from Git history</strong> using <code>git filter-branch</code> or BFG Repo Cleaner. Force-push all branches.</span></li>
+      <li><span class="step-n">3</span><span><strong>Revoke and audit</strong> — check Azure AD sign-in logs for any unexpected DB access using the leaked credential.</span></li>
+      <li><span class="step-n">4</span><span><strong>Long-term fix:</strong> Store all secrets in Azure Key Vault. Terraform should fetch them at runtime via data source — never store values in tfvars.</span></li>
+      <li><span class="step-n">5</span><span>Add <code>*.tfvars</code> to <code>.gitignore</code>. Add pre-commit hooks with tools like <code>git-secrets</code> or <code>detect-secrets</code>.</span></li>
+    </ul>
+    <div class="a-code"><span class="cmt"># WRONG: password in tfvars (never do this)</span>
+db_password = <span class="str">"SuperSecret123!"</span>
+
+<span class="cmt"># RIGHT: Fetch from Azure Key Vault at runtime</span>
+<span class="kw">data</span> <span class="str">"azurerm_key_vault_secret"</span> <span class="str">"db_pass"</span> {
+  <span class="attr">name</span>         = <span class="str">"db-admin-password"</span>
+  <span class="attr">key_vault_id</span> = <span class="var">var</span>.key_vault_id
+}
+
+<span class="kw">resource</span> <span class="str">"azurerm_mssql_server"</span> <span class="str">"sql"</span> {
+  <span class="attr">administrator_login_password</span> = <span class="res">data</span>.<span class="var">azurerm_key_vault_secret</span>.<span class="var">db_pass</span>.<span class="attr">value</span>
+}</div>
+    <div class="pro-tip"><strong>Best practice:</strong> Use Managed Identity where possible so there's no password at all. Azure services authenticate to each other without credentials.</div>
+  </div></div>
+</div>
+
+<!-- Q11 -->
+<div class="qa-card" data-tag="secrets">
+  <div class="qa-q" onclick="toggle(this)">
+    <div class="q-num">Q11</div>
+    <div class="q-body">
+      <div class="q-scenario" style="color:#10b981">Secrets · State File</div>
+      <div class="q-text">You realize your Terraform state file contains plain-text database passwords (from a <code>random_password</code> resource). The state file is stored in Azure Storage. What do you do?</div>
+      <div class="q-meta"><span class="diff-badge diff-mid">⚠️ Medium</span><span class="topic-badge">Secrets</span></div>
+    </div>
+    <div class="q-toggle"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></div>
+  </div>
+  <div class="qa-a"><div class="a-inner">
+    <div class="a-label">Answer</div>
+    <div class="a-text">Terraform state files <strong>always contain sensitive values</strong> in plain text — this is a known limitation. The state file cannot be encrypted by Terraform itself, so you must secure the storage layer.</div>
+    <ul class="a-steps">
+      <li><span class="step-n">1</span><span><strong>Enable Storage Account encryption</strong> — Azure Storage encrypts at rest by default with Microsoft-managed keys. For higher security, use Customer-Managed Keys (CMK) in Key Vault.</span></li>
+      <li><span class="step-n">2</span><span><strong>Restrict access</strong> — Use Azure RBAC to limit who can read the blob. Only the Terraform service principal and pipeline identity should have access.</span></li>
+      <li><span class="step-n">3</span><span><strong>Enable Private Endpoint</strong> on the Storage Account so it's not accessible from the public internet.</span></li>
+      <li><span class="step-n">4</span><span><strong>Mark variables sensitive</strong> — Although this doesn't encrypt state, it prevents values from appearing in plan/apply output.</span></li>
+    </ul>
+    <div class="a-code"><span class="cmt"># Secure state storage in Azure</span>
+<span class="kw">resource</span> <span class="str">"azurerm_storage_account"</span> <span class="str">"tfstate"</span> {
+  <span class="attr">name</span>                     = <span class="str">"sttfstate001"</span>
+  <span class="attr">resource_group_name</span>      = <span class="var">var</span>.rg_name
+  <span class="attr">location</span>                 = <span class="var">var</span>.location
+  <span class="attr">account_tier</span>             = <span class="str">"Standard"</span>
+  <span class="attr">account_replication_type</span> = <span class="str">"GRS"</span>
+  <span class="attr">min_tls_version</span>          = <span class="str">"TLS1_2"</span>
+  <span class="attr">allow_nested_items_to_be_public</span> = <span class="val">false</span>
+  <span class="attr">blob_properties</span> {
+    <span class="attr">versioning_enabled</span>  = <span class="val">true</span>
+    <span class="attr">delete_retention_policy</span> { days = <span class="val">30</span> }
+  }
+}
+<span class="cmt"># + Add azurerm_private_endpoint for network isolation</span></div>
+  </div></div>
+</div>
+
+<!-- ══════════════════════════ CI/CD ══════════════════════════ -->
+<div class="section-head">⚙️ CI/CD Pipeline Issues</div>
+
+<!-- Q12 -->
+<div class="qa-card" data-tag="cicd">
+  <div class="qa-q" onclick="toggle(this)">
+    <div class="q-num">Q12</div>
+    <div class="q-body">
+      <div class="q-scenario" style="color:#3b82f6">CI/CD · Plan vs Apply Mismatch</div>
+      <div class="q-text">Your pipeline runs <code>terraform plan</code> and it shows no changes. But when <code>terraform apply</code> runs 10 minutes later in the same pipeline, it suddenly wants to destroy resources. Why does this happen and how do you prevent it?</div>
+      <div class="q-meta"><span class="diff-badge diff-hot">🔥 Tricky</span><span class="topic-badge">CI/CD</span></div>
+    </div>
+    <div class="q-toggle"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></div>
+  </div>
+  <div class="qa-a"><div class="a-inner">
+    <div class="a-label">Answer</div>
+    <div class="a-text">This happens because <strong>another apply ran between your plan and apply</strong>, or the real infrastructure changed in that window. The plan was calculated against a different state than what apply sees.</div>
+    <div class="a-text"><strong>Fix:</strong> Always save the plan to a file and apply that exact saved plan — not a fresh plan.</div>
+    <div class="a-code"><span class="cmt"># WRONG: plan and apply separately — state can change between them</span>
+terraform plan
+terraform apply   <span class="cmt"># runs a fresh plan internally!</span>
+
+<span class="cmt"># RIGHT: save plan, apply the exact saved artifact</span>
+terraform plan -out=tfplan.binary    <span class="cmt"># save plan to file</span>
+<span class="cmt"># Upload tfplan.binary as pipeline artifact</span>
+<span class="cmt"># Download in apply stage:</span>
+terraform apply tfplan.binary        <span class="cmt"># applies EXACTLY what was planned</span>
+
+<span class="cmt"># Azure DevOps pipeline stages:</span>
+<span class="cmt"># Stage 1 (Plan): terraform plan -out=tfplan.binary</span>
+<span class="cmt"># Stage 2 (Approval gate)</span>
+<span class="cmt"># Stage 3 (Apply): terraform apply tfplan.binary</span></div>
+    <div class="pro-tip"><strong>Always separate Plan and Apply into different pipeline stages</strong> with the plan output saved as an artifact. This ensures the apply executes exactly what was reviewed and approved.</div>
+  </div></div>
+</div>
+
+<!-- Q13 -->
+<div class="qa-card" data-tag="cicd">
+  <div class="qa-q" onclick="toggle(this)">
+    <div class="q-num">Q13</div>
+    <div class="q-body">
+      <div class="q-scenario" style="color:#3b82f6">CI/CD · Provider Auth</div>
+      <div class="q-text">Your Terraform pipeline in Azure DevOps authenticates using a Service Principal client secret, but the secret expires every 90 days causing pipeline failures. How do you fix this long-term?</div>
+      <div class="q-meta"><span class="diff-badge diff-mid">⚠️ Operational</span><span class="topic-badge">Authentication</span></div>
+    </div>
+    <div class="q-toggle"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></div>
+  </div>
+  <div class="qa-a"><div class="a-inner">
+    <div class="a-label">Answer</div>
+    <div class="a-text">The best long-term solution is to eliminate the secret entirely using <strong>OIDC (Workload Identity Federation)</strong> for GitHub Actions or <strong>Managed Identity</strong> for Azure DevOps-hosted agents.</div>
+    <div class="a-code"><span class="cmt"># Option 1: Managed Identity (Azure DevOps self-hosted agent)</span>
+<span class="cmt"># Assign contributor role to the agent's managed identity</span>
+<span class="cmt"># In provider — no credentials needed:</span>
+<span class="kw">provider</span> <span class="str">"azurerm"</span> {
+  features {}
+  use_msi         = <span class="val">true</span>  <span class="cmt"># authenticate via Managed Identity</span>
+  subscription_id = <span class="var">var</span>.subscription_id
+}
+
+<span class="cmt"># Option 2: OIDC federation (GitHub Actions — no secret at all)</span>
+<span class="cmt"># GitHub Actions YAML:</span>
+permissions:
+  id-token: write
+  contents: read
+
+- uses: azure/login@v1
+  with:
+    client-id: ${{ secrets.AZURE_CLIENT_ID }}
+    tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+    subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    <span class="cmt"># No client-secret! Uses OIDC token exchange</span></div>
+    <div class="pro-tip"><strong>Managed Identity = zero secrets to rotate.</strong> For Azure DevOps with Microsoft-hosted agents, use OIDC + Workload Identity Federation. This is the recommended approach for 2024+.</div>
+  </div></div>
+</div>
+
+<!-- Q14 -->
+<div class="qa-card" data-tag="cicd">
+  <div class="qa-q" onclick="toggle(this)">
+    <div class="q-num">Q14</div>
+    <div class="q-body">
+      <div class="q-scenario" style="color:#3b82f6">CI/CD · Partial Apply</div>
+      <div class="q-text">A <code>terraform apply</code> runs in your pipeline and fails halfway through — 12 of 25 resources were created, 13 failed. The pipeline is now showing an error. What do you do?</div>
+      <div class="q-meta"><span class="diff-badge diff-hot">🔥 Incident</span><span class="topic-badge">Partial Apply</span></div>
+    </div>
+    <div class="q-toggle"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></div>
+  </div>
+  <div class="qa-a"><div class="a-inner">
+    <div class="a-label">Answer</div>
+    <div class="a-text">Terraform is designed to be <strong>idempotent</strong> — the correct response to a partial apply is simply to <strong>run apply again</strong>. Terraform will skip the 12 already-created resources and attempt only the 13 that failed.</div>
+    <ul class="a-steps">
+      <li><span class="step-n">1</span><span><strong>Read the error message</strong> carefully. Understand WHY the apply failed (quota limit, permission denied, dependency issue, etc.).</span></li>
+      <li><span class="step-n">2</span><span><strong>Fix the root cause</strong> — request quota increase, fix RBAC, fix the dependency order, or use <code>depends_on</code>.</span></li>
+      <li><span class="step-n">3</span><span><strong>Run terraform apply again</strong> — Terraform reads the current state, sees 12 resources already exist, and only creates the remaining 13.</span></li>
+      <li><span class="step-n">4</span><span><strong>Do NOT run terraform destroy</strong> first — that would tear down the 12 that were successfully created.</span></li>
+    </ul>
+    <div class="a-code"><span class="cmt"># Check current state to see what was created</span>
+terraform state list
+
+<span class="cmt"># Show details of a specific resource</span>
+terraform state show azurerm_subnet.web
+
+<span class="cmt"># Fix the issue, then simply re-run apply</span>
+terraform apply   <span class="cmt"># idempotent — only creates what's missing</span></div>
+  </div></div>
+</div>
+
+<!-- ══════════════════════════ MODULES ══════════════════════════ -->
+<div class="section-head">📦 Module & Multi-Environment Issues</div>
+
+<!-- Q15 -->
+<div class="qa-card" data-tag="modules">
+  <div class="qa-q" onclick="toggle(this)">
+    <div class="q-num">Q15</div>
+    <div class="q-body">
+      <div class="q-scenario" style="color:#f59e0b">Modules · Version Breaking Change</div>
+      <div class="q-text">You updated a shared Terraform module from v1.2 to v2.0 (breaking change). How do you roll this out across 10 teams using the module without breaking everyone's production?</div>
+      <div class="q-meta"><span class="diff-badge diff-hot">🔥 Enterprise</span><span class="topic-badge">Modules</span></div>
+    </div>
+    <div class="q-toggle"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></div>
+  </div>
+  <div class="qa-a"><div class="a-inner">
+    <div class="a-label">Answer</div>
+    <div class="a-text">The key is that all teams <strong>pin to a specific module version</strong>. A breaking change in v2.0 does not automatically affect anyone using <code>version = "~> 1.2"</code>.</div>
+    <ul class="a-steps">
+      <li><span class="step-n">1</span><span><strong>Publish v2.0 with a CHANGELOG</strong> documenting breaking changes and migration guide.</span></li>
+      <li><span class="step-n">2</span><span><strong>Teams opt-in explicitly</strong> — they update their source version pin and test in dev/staging first.</span></li>
+      <li><span class="step-n">3</span><span><strong>Maintain v1.x with security patches</strong> for a deprecation window (e.g., 3 months) to give teams time to migrate.</span></li>
+      <li><span class="step-n">4</span><span><strong>Canary rollout</strong> — pilot team upgrades first, validates in prod, then others follow.</span></li>
+    </ul>
+    <div class="a-code"><span class="cmt"># Teams pin module versions — v2.0 won't auto-affect them</span>
+<span class="kw">module</span> <span class="str">"network"</span> {
+  source  = <span class="str">"git::https://github.com/org/tf-modules.git//network"</span>
+  version = <span class="str">"~> 1.2"</span>    <span class="cmt"># safe: won't pick up v2.0</span>
+}
+
+<span class="cmt"># Team upgrades explicitly:</span>
+<span class="kw">module</span> <span class="str">"network"</span> {
+  source  = <span class="str">"git::https://github.com/org/tf-modules.git//network"</span>
+  version = <span class="str">"~> 2.0"</span>    <span class="cmt"># opt-in to v2 after testing</span>
+}</div>
+    <div class="pro-tip"><strong>Best practice:</strong> Use Git tags for versioning (v1.2.0, v2.0.0) and host modules in a private Terraform Registry or Azure Artifacts feed for version discoverability.</div>
+  </div></div>
+</div>
+
+<!-- Q16 -->
+<div class="qa-card" data-tag="modules">
+  <div class="qa-q" onclick="toggle(this)">
+    <div class="q-num">Q16</div>
+    <div class="q-body">
+      <div class="q-scenario" style="color:#f59e0b">Modules · Large State</div>
+      <div class="q-text">Your Terraform state file has grown to 50MB with 800+ resources. <code>terraform plan</code> takes 20+ minutes. How do you fix this?</div>
+      <div class="q-meta"><span class="diff-badge diff-mid">⚠️ Performance</span><span class="topic-badge topic-state">State</span></div>
+    </div>
+    <div class="q-toggle"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></div>
+  </div>
+  <div class="qa-a"><div class="a-inner">
+    <div class="a-label">Answer</div>
+    <div class="a-text">A monolithic state is an anti-pattern at scale. The solution is to <strong>split the state</strong> into logical stacks (networking, compute, data, apps) — each with its own state file.</div>
+    <ul class="a-steps">
+      <li><span class="step-n">1</span><span>Identify logical boundaries: <code>networking/</code>, <code>compute/</code>, <code>databases/</code>, <code>apps/</code></span></li>
+      <li><span class="step-n">2</span><span>Use <code>terraform state mv</code> to move resources into the new state files one group at a time.</span></li>
+      <li><span class="step-n">3</span><span>Use <code>terraform_remote_state</code> data sources for cross-stack references (e.g., compute stack reads VNet ID from network stack output).</span></li>
+      <li><span class="step-n">4</span><span>Intermediate fix: use <code>-target</code> flag to run plan on a subset of resources only during migration.</span></li>
+    </ul>
+    <div class="a-code"><span class="cmt"># Move resources to new state file</span>
+terraform state mv \
+  -state=monolith.tfstate \
+  -state-out=network.tfstate \
+  azurerm_virtual_network.vnet
+
+<span class="cmt"># Cross-stack reference in compute stack</span>
+<span class="kw">data</span> <span class="str">"terraform_remote_state"</span> <span class="str">"network"</span> {
+  backend = <span class="str">"azurerm"</span>
+  config = {
+    resource_group_name  = <span class="str">"rg-tfstate"</span>
+    storage_account_name = <span class="str">"sttfstate001"</span>
+    container_name       = <span class="str">"tfstate"</span>
+    key                  = <span class="str">"network/eastus.tfstate"</span>
+  }
+}
+<span class="cmt"># Now plan only touches 80 compute resources instead of 800</span></div>
+  </div></div>
+</div>
+
+<!-- ══════════════════════════ PERFORMANCE ══════════════════════════ -->
+<div class="section-head">🚀 Performance & Provider Issues</div>
+
+<!-- Q17 -->
+<div class="qa-card" data-tag="perf">
+  <div class="qa-q" onclick="toggle(this)">
+    <div class="q-num">Q17</div>
+    <div class="q-body">
+      <div class="q-scenario" style="color:#06b6d4">Provider · API Rate Limiting</div>
+      <div class="q-text">Your <code>terraform apply</code> intermittently fails with <em>"429 Too Many Requests"</em> from Azure's REST API, especially when creating 50+ resources. How do you handle this?</div>
+      <div class="q-meta"><span class="diff-badge diff-mid">⚠️ Medium</span><span class="topic-badge">Provider</span></div>
+    </div>
+    <div class="q-toggle"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></div>
+  </div>
+  <div class="qa-a"><div class="a-inner">
+    <div class="a-label">Answer</div>
+    <div class="a-text">Azure ARM API has per-subscription rate limits. The azurerm provider and Terraform have mechanisms to handle this gracefully.</div>
+    <div class="a-code"><span class="cmt"># Reduce parallel resource creation (default is 10)</span>
+terraform apply -parallelism=5   <span class="cmt"># lower = fewer concurrent API calls</span>
+
+<span class="cmt"># AzureRM provider retry configuration</span>
+<span class="kw">provider</span> <span class="str">"azurerm"</span> {
+  features {}
+  <span class="attr">subscription_id</span> = <span class="var">var</span>.subscription_id
+  <span class="cmt"># AzureRM provider has built-in exponential backoff</span>
+  <span class="cmt"># Set env var for more retries:</span>
+  <span class="cmt"># ARM_RETRY_MAX = 3 (default)</span>
+}
+
+<span class="cmt"># Add sleep between resource-heavy batches</span>
+<span class="kw">resource</span> <span class="str">"time_sleep"</span> <span class="str">"wait_after_vm_batch"</span> {
+  <span class="attr">depends_on</span>      = [<span class="attr">azurerm_linux_virtual_machine</span>.vms]
+  <span class="attr">create_duration</span> = <span class="str">"30s"</span>
+}
+
+<span class="cmt"># Split large deployments into separate applies:</span>
+<span class="cmt"># 1. terraform apply -target=module.networking</span>
+<span class="cmt"># 2. terraform apply -target=module.compute</span>
+<span class="cmt"># 3. terraform apply (remaining)</span></div>
+    <div class="key-chips">
+      <span class="chip">-parallelism=5</span>
+      <span class="chip green">time_sleep resource</span>
+      <span class="chip orange">-target batching</span>
+    </div>
+  </div></div>
+</div>
+
+<!-- Q18 -->
+<div class="qa-card" data-tag="perf">
+  <div class="qa-q" onclick="toggle(this)">
+    <div class="q-num">Q18</div>
+    <div class="q-body">
+      <div class="q-scenario" style="color:#06b6d4">Provider · Version Upgrade</div>
+      <div class="q-text">After upgrading the AzureRM provider from 3.x to 4.x, your <code>terraform plan</code> shows unexpected changes across 200 resources even though you changed nothing in your code. What happened?</div>
+      <div class="q-meta"><span class="diff-badge diff-hot">🔥 Trap</span><span class="topic-badge">Provider</span></div>
+    </div>
+    <div class="q-toggle"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></div>
+  </div>
+  <div class="qa-a"><div class="a-inner">
+    <div class="a-label">Answer</div>
+    <div class="a-text">Major provider version bumps (3.x → 4.x) often have <strong>breaking changes, renamed attributes, or new defaults</strong>. The provider is now interpreting your unchanged HCL differently, producing a diff against the real infrastructure.</div>
+    <ul class="a-steps">
+      <li><span class="step-n">1</span><span><strong>Read the provider changelog</strong> at registry.terraform.io/providers/hashicorp/azurerm — look for breaking changes in the upgrade guide.</span></li>
+      <li><span class="step-n">2</span><span><strong>Rollback immediately</strong> in the <code>.terraform.lock.hcl</code> by reverting the provider version pin.</span></li>
+      <li><span class="step-n">3</span><span><strong>Test the upgrade in dev</strong> first — review every resource change in the plan output, then update your code to match new attribute names.</span></li>
+      <li><span class="step-n">4</span><span><strong>Always pin provider versions</strong> using <code>~></code> to allow only minor/patch updates, not major version jumps.</span></li>
+    </ul>
+    <div class="a-code"><span class="cmt"># Always pin versions — prevent surprise upgrades</span>
+<span class="kw">terraform</span> {
+  required_providers {
+    azurerm = {
+      source  = <span class="str">"hashicorp/azurerm"</span>
+      version = <span class="str">"~> 3.80"</span>   <span class="cmt"># locks to 3.x only, never 4.x</span>
+    }
+  }
+  required_version = <span class="str">">= 1.5.0, < 2.0.0"</span>
+}
+
+<span class="cmt"># .terraform.lock.hcl is committed to Git</span>
+<span class="cmt"># This ensures ALL team members and pipelines use identical provider versions</span>
+<span class="cmt"># terraform init -upgrade   # to update lock file deliberately</span></div>
+    <div class="pro-tip"><strong>Always commit <code>.terraform.lock.hcl</code> to Git.</strong> This is the provider equivalent of <code>package-lock.json</code> — it guarantees reproducible runs across all machines and pipelines.</div>
+  </div></div>
+</div>
+
+<!-- Q19 -->
+<div class="qa-card" data-tag="perf">
+  <div class="qa-q" onclick="toggle(this)">
+    <div class="q-num">Q19</div>
+    <div class="q-body">
+      <div class="q-scenario" style="color:#06b6d4">Performance · Circular Dependency</div>
+      <div class="q-text">Terraform fails with: <em>"Error: Cycle: resource A depends on resource B, resource B depends on resource A"</em>. How do you identify and resolve circular dependencies in production?</div>
+      <div class="q-meta"><span class="diff-badge diff-mid">⚠️ Medium</span><span class="topic-badge">Dependencies</span></div>
+    </div>
+    <div class="q-toggle"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></div>
+  </div>
+  <div class="qa-a"><div class="a-inner">
+    <div class="a-label">Answer</div>
+    <div class="a-text">Circular dependencies usually happen when two resources both reference each other's attributes. The fix is to <strong>break the cycle</strong> by introducing an intermediate resource or using <code>-target</code> for bootstrap ordering.</div>
+    <div class="a-code"><span class="cmt"># Identify the cycle visually</span>
+terraform graph | dot -Tsvg > dependency_graph.svg
+
+<span class="cmt"># Common scenario: NSG ↔ Subnet association cycle</span>
+<span class="cmt"># PROBLEM: subnet references NSG, NSG references subnet</span>
+
+<span class="cmt"># SOLUTION: Decouple using a separate association resource</span>
+<span class="kw">resource</span> <span class="str">"azurerm_subnet"</span> <span class="str">"web"</span> {
+  <span class="attr">name</span>                 = <span class="str">"snet-web"</span>
+  <span class="attr">virtual_network_name</span> = <span class="var">var</span>.vnet_name
+  <span class="attr">resource_group_name</span>  = <span class="var">var</span>.rg_name
+  <span class="attr">address_prefixes</span>     = [<span class="str">"10.0.1.0/24"</span>]
+  <span class="cmt"># Don't set network_security_group_id here</span>
+}
+
+<span class="kw">resource</span> <span class="str">"azurerm_network_security_group"</span> <span class="str">"nsg"</span> {
+  <span class="attr">name</span>                = <span class="str">"nsg-web"</span>
+  <span class="attr">resource_group_name</span> = <span class="var">var</span>.rg_name
+  <span class="attr">location</span>            = <span class="var">var</span>.location
+}
+
+<span class="cmt"># Association resource AFTER both — breaks the cycle</span>
+<span class="kw">resource</span> <span class="str">"azurerm_subnet_network_security_group_association"</span> <span class="str">"assoc"</span> {
+  <span class="attr">subnet_id</span>                 = <span class="res">azurerm_subnet</span>.<span class="var">web</span>.<span class="attr">id</span>
+  <span class="attr">network_security_group_id</span> = <span class="res">azurerm_network_security_group</span>.<span class="var">nsg</span>.<span class="attr">id</span>
+}</div>
+  </div></div>
+</div>
+
+<!-- ══════════════════════════ ADVANCED ══════════════════════════ -->
+<div class="section-head">🎯 Advanced Production Scenarios</div>
+
+<!-- Q20 -->
+<div class="qa-card" data-tag="state">
+  <div class="qa-q" onclick="toggle(this)">
+    <div class="q-num">Q20</div>
+    <div class="q-body">
+      <div class="q-scenario" style="color:#06b6d4">Terraform · Import at Scale</div>
+      <div class="q-text">You've inherited 200+ Azure resources created manually by a previous team. Management wants everything under Terraform control. What is your import strategy?</div>
+      <div class="q-meta"><span class="diff-badge diff-hot">🔥 Enterprise</span><span class="topic-badge">Import</span></div>
+    </div>
+    <div class="q-toggle"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></div>
+  </div>
+  <div class="qa-a"><div class="a-inner">
+    <div class="a-label">Answer</div>
+    <div class="a-text">Importing 200 resources manually is impractical. Use a phased approach with automation.</div>
+    <ul class="a-steps">
+      <li><span class="step-n">1</span><span><strong>Audit everything first</strong> — use Azure Resource Graph to list all resources with their IDs.</span></li>
+      <li><span class="step-n">2</span><span><strong>Use aztfexport (AzAPI)</strong> — Microsoft's official tool that generates both Terraform config AND import blocks from existing Azure resources automatically.</span></li>
+      <li><span class="step-n">3</span><span><strong>Prioritize by risk</strong> — import networking first (most shared), then compute, then apps.</span></li>
+      <li><span class="step-n">4</span><span>After each import, run <code>terraform plan</code> — it should show NO changes. If it shows changes, fix your HCL to match the real resource before proceeding.</span></li>
+      <li><span class="step-n">5</span><span><strong>Freeze changes</strong> on those resources until they're fully under Terraform control.</span></li>
+    </ul>
+    <div class="a-code"><span class="cmt"># Use aztfexport for bulk generation</span>
+aztfexport resource-group --resource-group-name rg-prod
+
+<span class="cmt"># Or use TF 1.5+ import blocks in bulk</span>
+<span class="kw">import</span> {
+  to = <span class="attr">azurerm_virtual_network</span>.vnet
+  id = <span class="str">"/subscriptions/xxx/resourceGroups/rg-prod/providers/Microsoft.Network/virtualNetworks/vnet-prod"</span>
+}
+
+<span class="cmt"># Generate config from import blocks:</span>
+terraform plan -generate-config-out=generated.tf
+<span class="cmt"># Review generated.tf → clean it up → terraform apply</span></div>
+    <div class="pro-tip"><strong>Terraform 1.5+ generate-config-out</strong> can auto-generate HCL from import blocks. This dramatically speeds up large-scale imports.</div>
+  </div></div>
+</div>
+
+<!-- Q21 -->
+<div class="qa-card" data-tag="cicd">
+  <div class="qa-q" onclick="toggle(this)">
+    <div class="q-num">Q21</div>
+    <div class="q-body">
+      <div class="q-scenario" style="color:#3b82f6">Multi-Env · Environment Promotion</div>
+      <div class="q-text">How do you implement a prod-identical staging environment and ensure changes are validated there before being promoted to production?</div>
+      <div class="q-meta"><span class="diff-badge diff-mid">⚠️ Design</span><span class="topic-badge">Environments</span></div>
+    </div>
+    <div class="q-toggle"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></div>
+  </div>
+  <div class="qa-a"><div class="a-inner">
+    <div class="a-label">Answer</div>
+    <div class="a-text">Use the same Terraform modules for both environments, with different <code>tfvars</code> files controlling the differences (VM size, replica counts, etc.). The key is <strong>one code path, different variable inputs</strong>.</div>
+    <div class="a-code"><span class="cmt"># Directory structure</span>
+<span class="cmt"># environments/</span>
+<span class="cmt">#   staging/  → terraform.tfvars (smaller SKUs, 1 replica)</span>
+<span class="cmt">#   prod/     → terraform.tfvars (larger SKUs, 3 replicas)</span>
+
+<span class="cmt"># staging.tfvars</span>
+vm_size     = <span class="str">"Standard_B2s"</span>
+db_sku      = <span class="str">"GP_Gen5_2"</span>
+replica_count = <span class="val">1</span>
+environment = <span class="str">"staging"</span>
+
+<span class="cmt"># prod.tfvars</span>
+vm_size     = <span class="str">"Standard_D4s_v3"</span>
+db_sku      = <span class="str">"BC_Gen5_4"</span>
+replica_count = <span class="val">3</span>
+environment = <span class="str">"prod"</span>
+
+<span class="cmt"># Pipeline: staging apply → manual approval gate → prod apply</span>
+<span class="cmt"># Azure DevOps: use Environments with approval checks</span></div>
+    <div class="pro-tip">Environments share the same modules but have separate state backends. Staging should use <strong>identical resource types</strong> as prod — just smaller. Using different resource types (e.g., Free tier in staging) hides compatibility bugs.</div>
+  </div></div>
+</div>
+
+<!-- Q22 -->
+<div class="qa-card" data-tag="refactor">
+  <div class="qa-q" onclick="toggle(this)">
+    <div class="q-num">Q22</div>
+    <div class="q-body">
+      <div class="q-scenario" style="color:#8b5cf6">Zero Downtime · Blue-Green</div>
+      <div class="q-text">You need to update a production VM SKU in Azure using Terraform. The resource requires <strong>replacement</strong> (destroy + create). How do you do this with zero downtime?</div>
+      <div class="q-meta"><span class="diff-badge diff-hot">🔥 Production</span><span class="topic-badge">Zero Downtime</span></div>
+    </div>
+    <div class="q-toggle"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></div>
+  </div>
+  <div class="qa-a"><div class="a-inner">
+    <div class="a-label">Answer</div>
+    <div class="a-text">Use <code>create_before_destroy = true</code> in the lifecycle block. This tells Terraform to spin up the new VM first, and only destroy the old one after the new one is healthy.</div>
+    <div class="a-code"><span class="kw">resource</span> <span class="str">"azurerm_linux_virtual_machine"</span> <span class="str">"app"</span> {
+  <span class="attr">name</span>  = <span class="str">"vm-app-prod"</span>
+  <span class="attr">size</span>  = <span class="var">var</span>.vm_size   <span class="cmt"># change Standard_B2s → Standard_D4s_v3</span>
+
+  <span class="attr">lifecycle</span> {
+    <span class="attr">create_before_destroy</span> = <span class="val">true</span>
+  }
+}
+
+<span class="cmt"># For stateless apps: use VMSS (scale sets) with rolling upgrade</span>
+<span class="kw">resource</span> <span class="str">"azurerm_linux_virtual_machine_scale_set"</span> <span class="str">"app"</span> {
+  <span class="attr">upgrade_mode</span> = <span class="str">"Rolling"</span>
+  <span class="attr">rolling_upgrade_policy</span> {
+    <span class="attr">max_batch_instance_percent</span>              = <span class="val">25</span>
+    <span class="attr">max_unhealthy_instance_percent</span>          = <span class="val">20</span>
+    <span class="attr">max_unhealthy_upgraded_instance_percent</span> = <span class="val">20</span>
+    <span class="attr">pause_time_between_batches</span>              = <span class="str">"PT5M"</span>
+  }
+}
+<span class="cmt"># VMSS rolling upgrade: replaces 25% at a time, 5-min pause between batches</span></div>
+  </div></div>
+</div>
+
+<!-- Q23 -->
+<div class="qa-card" data-tag="state">
+  <div class="qa-q" onclick="toggle(this)">
+    <div class="q-num">Q23</div>
+    <div class="q-body">
+      <div class="q-scenario" style="color:#06b6d4">State · Backend Migration</div>
+      <div class="q-text">Your team has been using local state files. You need to migrate to Azure Storage backend without losing any state and without disrupting any running infrastructure. Walk through the steps.</div>
+      <div class="q-meta"><span class="diff-badge diff-mid">⚠️ Operational</span><span class="topic-badge topic-state">Backend Migration</span></div>
+    </div>
+    <div class="q-toggle"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></div>
+  </div>
+  <div class="qa-a"><div class="a-inner">
+    <div class="a-label">Answer</div>
+    <div class="a-text">Terraform has a built-in migration command. The process is safe and non-destructive — your infrastructure is not touched during backend migration.</div>
+    <ul class="a-steps">
+      <li><span class="step-n">1</span><span><strong>Create the Azure Storage Account</strong> for state (using Azure CLI or portal — do this first, outside of Terraform).</span></li>
+      <li><span class="step-n">2</span><span><strong>Add the backend block</strong> to your <code>terraform.tf</code> configuration.</span></li>
+      <li><span class="step-n">3</span><span>Run <code>terraform init -migrate-state</code> — Terraform detects you have local state and offers to copy it to the new remote backend.</span></li>
+      <li><span class="step-n">4</span><span>Terraform copies the state. Run <code>terraform plan</code> — should show NO changes (state is identical).</span></li>
+      <li><span class="step-n">5</span><span>Delete or archive the local <code>terraform.tfstate</code> file and <strong>never commit it to Git</strong> again.</span></li>
+    </ul>
+    <div class="a-code"><span class="cmt"># Step 1: Create storage outside Terraform (one-time)</span>
+az storage account create -n sttfstate001 -g rg-tfstate --sku Standard_LRS
+az storage container create -n tfstate --account-name sttfstate001
+
+<span class="cmt"># Step 2: Add backend to main.tf</span>
+<span class="kw">terraform</span> {
+  backend <span class="str">"azurerm"</span> {
+    resource_group_name  = <span class="str">"rg-tfstate"</span>
+    storage_account_name = <span class="str">"sttfstate001"</span>
+    container_name       = <span class="str">"tfstate"</span>
+    key                  = <span class="str">"prod.terraform.tfstate"</span>
+  }
+}
+
+<span class="cmt"># Step 3: Migrate</span>
+terraform init -migrate-state   <span class="cmt"># copies local state → Azure blob</span>
+
+<span class="cmt"># Step 4: Verify</span>
+terraform plan   <span class="cmt"># must show zero changes</span></div>
+  </div></div>
+</div>
+
+<!-- Q24 -->
+<div class="qa-card" data-tag="cicd">
+  <div class="qa-q" onclick="toggle(this)">
+    <div class="q-num">Q24</div>
+    <div class="q-body">
+      <div class="q-scenario" style="color:#3b82f6">Policy · Compliance Gate</div>
+      <div class="q-text">Your security team requires that all Azure resources in production must have specific tags (CostCenter, Owner, Environment) and no public IPs should be created. How do you enforce this in your Terraform pipeline?</div>
+      <div class="q-meta"><span class="diff-badge diff-mid">⚠️ Compliance</span><span class="topic-badge">Policy</span></div>
+    </div>
+    <div class="q-toggle"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></div>
+  </div>
+  <div class="qa-a"><div class="a-inner">
+    <div class="a-label">Answer</div>
+    <div class="a-text">Multi-layer enforcement: <strong>Terraform validation</strong> + <strong>static analysis in CI</strong> + <strong>Azure Policy</strong> as a backstop.</div>
+    <div class="a-code"><span class="cmt"># Layer 1: Terraform variable validation</span>
+<span class="kw">variable</span> <span class="str">"tags"</span> {
+  <span class="attr">type</span> = <span class="fn">object</span>({ CostCenter = <span class="fn">string</span>, Owner = <span class="fn">string</span>, Environment = <span class="fn">string</span> })
+  <span class="attr">validation</span> {
+    condition     = <span class="fn">contains</span>([<span class="str">"dev"</span>,<span class="str">"staging"</span>,<span class="str">"prod"</span>], <span class="var">var</span>.tags.Environment)
+    error_message = <span class="str">"Environment must be dev, staging, or prod."</span>
+  }
+}
+
+<span class="cmt"># Layer 2: checkov scan in CI (catches public IPs, missing tags)</span>
+<span class="cmt"># In azure-pipelines.yml:</span>
+<span class="cmt"># - script: pip install checkov && checkov -d . --framework terraform</span>
+
+<span class="cmt"># Layer 3: Azure Policy (enforced even outside Terraform)</span>
+<span class="kw">resource</span> <span class="str">"azurerm_policy_assignment"</span> <span class="str">"require_tags"</span> {
+  <span class="attr">name</span>                 = <span class="str">"require-tags"</span>
+  <span class="attr">scope</span>                = <span class="var">var</span>.subscription_id
+  <span class="attr">policy_definition_id</span> = <span class="str">"/providers/Microsoft.Authorization/policyDefinitions/..."</span>
+  <span class="attr">parameters</span>           = <span class="fn">jsonencode</span>({ tagName = { value = <span class="str">"CostCenter"</span> } })
+}</div>
+    <div class="key-chips">
+      <span class="chip">variable validation</span>
+      <span class="chip green">checkov / tfsec</span>
+      <span class="chip orange">Azure Policy backstop</span>
+    </div>
+  </div></div>
+</div>
+
+<!-- Q25 -->
+<div class="qa-card" data-tag="secrets">
+  <div class="qa-q" onclick="toggle(this)">
+    <div class="q-num">Q25</div>
+    <div class="q-body">
+      <div class="q-scenario" style="color:#10b981">Terraform · Multi-Subscription</div>
+      <div class="q-text">You need to deploy resources across 3 Azure subscriptions (hub, spoke-dev, spoke-prod) in a single Terraform run. How do you configure this and what challenges arise?</div>
+      <div class="q-meta"><span class="diff-badge diff-hot">🔥 Enterprise</span><span class="topic-badge">Multi-Sub</span></div>
+    </div>
+    <div class="q-toggle"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></div>
+  </div>
+  <div class="qa-a"><div class="a-inner">
+    <div class="a-label">Answer</div>
+    <div class="a-text">Use <strong>provider aliases</strong> — one azurerm provider block per subscription with an alias. Resources specify which provider (subscription) they belong to.</div>
+    <div class="a-code"><span class="cmt"># providers.tf — one alias per subscription</span>
+<span class="kw">provider</span> <span class="str">"azurerm"</span> {
+  features {}
+  alias           = <span class="str">"hub"</span>
+  subscription_id = <span class="var">var</span>.hub_subscription_id
+}
+
+<span class="kw">provider</span> <span class="str">"azurerm"</span> {
+  features {}
+  alias           = <span class="str">"spoke_dev"</span>
+  subscription_id = <span class="var">var</span>.dev_subscription_id
+}
+
+<span class="kw">provider</span> <span class="str">"azurerm"</span> {
+  features {}
+  alias           = <span class="str">"spoke_prod"</span>
+  subscription_id = <span class="var">var</span>.prod_subscription_id
+}
+
+<span class="cmt"># Use alias in resources</span>
+<span class="kw">resource</span> <span class="str">"azurerm_virtual_network"</span> <span class="str">"hub_vnet"</span> {
+  <span class="attr">provider</span> = <span class="attr">azurerm</span>.hub
+  <span class="attr">name</span>     = <span class="str">"vnet-hub"</span>
+  ...
+}
+
+<span class="kw">resource</span> <span class="str">"azurerm_virtual_network_peering"</span> <span class="str">"hub_to_dev"</span> {
+  <span class="attr">provider</span>                  = <span class="attr">azurerm</span>.hub
+  <span class="attr">remote_virtual_network_id</span> = <span class="res">azurerm_virtual_network</span>.<span class="var">dev_vnet</span>.<span class="attr">id</span>
+  ...
+}
+
+<span class="cmt"># Challenge: Service Principal must have Contributor</span>
+<span class="cmt"># access across all 3 subscriptions, OR use separate SPs</span>
+<span class="cmt"># with assume_identity per provider alias.</span></div>
+    <div class="pro-tip"><strong>Enterprise recommendation:</strong> Use a dedicated "Terraform SP" with RBAC contributor on all three subscriptions, and store cross-subscription state keys in a shared backend using separate blob keys per environment.</div>
+    <div class="key-chips">
+      <span class="chip">provider aliases</span>
+      <span class="chip green">cross-sub RBAC</span>
+      <span class="chip orange">VNet peering cross-sub</span>
+    </div>
+  </div></div>
+</div>
+
+</div><!-- end .wrap -->
+
+<script>
+function toggle(btn) {
+  const card = btn.closest('.qa-card');
+  card.classList.toggle('open');
+}
+
+function toggleAll(open) {
+  document.querySelectorAll('.qa-card').forEach(c => {
+    open ? c.classList.add('open') : c.classList.remove('open');
+  });
+}
+
+function filterCards(tag, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.qa-card').forEach(c => {
+    if(tag === 'all' || c.dataset.tag === tag) {
+      c.style.display = '';
+    } else {
+      c.style.display = 'none';
+      c.classList.remove('open');
+    }
+  });
+  // hide empty section headers
+  document.querySelectorAll('.section-head').forEach(h => {
+    let next = h.nextElementSibling;
+    let anyVisible = false;
+    while(next && !next.classList.contains('section-head')) {
+      if(next.style.display !== 'none') anyVisible = true;
+      next = next.nextElementSibling;
+    }
+    h.style.display = anyVisible ? '' : 'none';
+  });
+}
+</script>
+</body>
+</html>
