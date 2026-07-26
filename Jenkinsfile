@@ -38,7 +38,7 @@ pipeline {
                 echo "Cleaning Nginx web directory..."
 
                 sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
-                    sudo rm -rf /usr/share/nginx/html/*
+                    rm -rf /usr/share/nginx/html/*
                 "
 
                 echo "Copying snake.html..."
@@ -50,7 +50,7 @@ pipeline {
                 echo "Reloading Nginx..."
 
                 sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
-                    sudo systemctl reload nginx
+                    systemctl reload nginx
                 "
                 '''
                 }
