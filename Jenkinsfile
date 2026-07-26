@@ -50,7 +50,7 @@ pipeline {
                 echo "Reloading Nginx..."
 
                 sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
-                    systemctl reload nginx
+                    sudo systemctl reload nginx
                 "
                 '''
                 }
