@@ -38,14 +38,14 @@ pipeline {
                 echo "Cleaning Nginx web directory..."
 
                 sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
-                    rm -rf /usr/share/nginx/html/*
+                    rm -rf /var/www/snake-game*
                 "
 
                 echo "Copying snake.html..."
 
                 sshpass -p "$PASS" scp -o StrictHostKeyChecking=no \
                     snake.html \
-                    $USER@$SERVER_IP:/usr/share/nginx/html/index.html
+                    $USER@$SERVER_IP:/var/www/snake-game/snake.html
 
                 echo "Reloading Nginx..."
 
