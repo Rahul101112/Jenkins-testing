@@ -1,3 +1,4 @@
+#########REDHAT EC2############
 AWS EC2 - Root SSH Login & Password Authentication Fix
 
 sudo grep disable_root /etc/cloud/cloud.cfg
@@ -14,3 +15,44 @@ Change
 PasswordAuthentication no  to PasswordAuthentication yes
 
 sudo systemctl restart sshd
+
+
+
+
+###Amazon Linux EC2############
+
+#!/bin/bash
+set -e
+
+echo "==> Configuring root SSH login..."
+
+# Backup
+cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup.$(date +%Y%m%d-%H%M%S)
+
+# Remove existing effective settings
+sed -i '/^[[:space:]]*PermitRootLogin[[:space:]]/d' /etc/ssh/sshd_config
+sed -i '/^[[:space:]]*PasswordAuthentication[[:space:]]/d' /etc/ssh/sshd_config
+
+# Add settings at beginning
+sed -i '1i PermitRootLogin yes\nPasswordAuthentication yes' /etc/ssh/sshd_config
+
+# Prevent cloud-init from disabling root
+if [ -f /etc/cloud/cloud.cfg ]; then
+    sed -i 's/^[[:space:]]*disable_root:[[:space:]]*true/disable_root: false/' /etc/cloud/cloud.cfg
+fi
+
+# Set root password
+passwd root
+
+# Validate SSH configuration
+sshd -t
+
+# Restart SSH
+systemctl restart sshd
+
+echo ""
+echo "==> Effective SSH configuration:"
+sshd -T | grep -Ei 'permitrootlogin|passwordauthentication'
+
+echo ""
+echo "==> Done."
