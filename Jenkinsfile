@@ -30,54 +30,33 @@ pipeline {
 
         stage('Deploy to Snake Game To Nginx') {
             steps {
-                withCredentials([
-                string(credentialsId: 'Web-server-ip', variable: 'SERVER_IP'),
-                sshUserPrivateKey(
-                credentialsId: 'Server-Key',
-                usernameVariable: 'USER',
-                keyFileVariable: 'SSH_KEY'
-                        )
-                ])
+               
 
                 {
-            sh '''
-                set -e
+                     sh '''
+                 echo "Cleaning Nginx web directory..."
+                    rm -rf /usr/share/nginx/html/*
 
-                echo "Cleaning Nginx web directory..."
+                 echo "Copying snake.html...."
+                 '''
 
-                ssh -i "$SSH_KEY" \
-                    -o BatchMode=yes \
-                    -o StrictHostKeyChecking=yes \
-                    "$USER@$SERVER_IP" \
-                    "sudo find /usr/share/nginx/html -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +"
-
-                echo "Copying Snake Game..."
-
-                scp -i "$SSH_KEY" \
-                    -o BatchMode=yes \
-                    -o StrictHostKeyChecking=yes \
-                    snake.html \
-                    "$USER@$SERVER_IP:/tmp/snake-index.html"
-
-                echo "Installing website..."
-
-                ssh -i "$SSH_KEY" \
-                    -o BatchMode=yes \
-                    -o StrictHostKeyChecking=yes \
-                    "$USER@$SERVER_IP" \
-                    "sudo install -m 644 /tmp/snake-index.html /usr/share/nginx/html/index.html && rm -f /tmp/snake-index.html"
-
-                echo "Reloading Nginx..."
-
-                ssh -i "$SSH_KEY" \
-                    -o BatchMode=yes \
-                    -o StrictHostKeyChecking=yes \
-                    "$USER@$SERVER_IP" \
-                    "sudo systemctl reload nginx"
-
-                echo "Deployment completed successfully!"
-            '''
-        }
+                sshPublisher(
+            publishers: [
+                sshPublisherDesc(
+                    configName: 'web-server',
+                    transfers: [
+                        sshTransfer(
+                            sourceFiles: 'snake.html',
+                            removePrefix: '',
+                            remoteDirectory: '/usr/share/nginx/html',
+                            execCommand: 'sudo systemctl reload nginx'
+                        )
+                    ],
+                    verbose: true
+                )
+            ]
+        )
+                }
             }
         }
 
