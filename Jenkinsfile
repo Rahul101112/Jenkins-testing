@@ -28,40 +28,58 @@ pipeline {
                 }
             }
 
-        // stage('Deploy to Snake Game To Nginx') {
-        //     steps {
-        //         withCredentials([
-        //         string(credentialsId: 'web-server-ip', variable: 'SERVER_IP'),
-        //         usernamePassword(
-        //         credentialsId: 'web-server-creds',
-        //         usernameVariable: 'USER',
-        //         passwordVariable: 'PASS'
-        //                 )
-        //         ])
+        stage('Deploy to Snake Game To Nginx') {
+            steps {
+                withCredentials([
+                string(credentialsId: 'Web-server-ip', variable: 'SERVER_IP'),
+                sshUserPrivateKey(
+                credentialsId: 'Server-Key',
+                usernameVariable: 'USER',
+                keyFileVariable: 'SSH_KEY'
+                        )
+                ])
 
-        //         {
-        //             sh '''
-        //         echo "Cleaning Nginx web directory..."
+                {
+            sh '''
+                set -e
 
-        //         sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
-        //             rm -rf /var/www/snake/*
-        //         "
+                echo "Cleaning Nginx web directory..."
 
-        //         echo "Copying snake.html...."
+                ssh -i "$SSH_KEY" \
+                    -o BatchMode=yes \
+                    -o StrictHostKeyChecking=yes \
+                    "$USER@$SERVER_IP" \
+                    "sudo find /usr/share/nginx/html -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +"
 
-        //         sshpass -p "$PASS" scp -o StrictHostKeyChecking=no \
-        //             snake.html \
-        //             $USER@$SERVER_IP:/var/www/snake/index.html
+                echo "Copying Snake Game..."
 
-        //         echo "Reloading Nginx..."
+                scp -i "$SSH_KEY" \
+                    -o BatchMode=yes \
+                    -o StrictHostKeyChecking=yes \
+                    snake.html \
+                    "$USER@$SERVER_IP:/tmp/snake-index.html"
 
-        //         sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
-        //             sudo systemctl reload nginx
-        //         "
-        //         '''
-        //         }
-        //     }
-        // }
+                echo "Installing website..."
+
+                ssh -i "$SSH_KEY" \
+                    -o BatchMode=yes \
+                    -o StrictHostKeyChecking=yes \
+                    "$USER@$SERVER_IP" \
+                    "sudo install -m 644 /tmp/snake-index.html /usr/share/nginx/html/index.html && rm -f /tmp/snake-index.html"
+
+                echo "Reloading Nginx..."
+
+                ssh -i "$SSH_KEY" \
+                    -o BatchMode=yes \
+                    -o StrictHostKeyChecking=yes \
+                    "$USER@$SERVER_IP" \
+                    "sudo systemctl reload nginx"
+
+                echo "Deployment completed successfully!"
+            '''
+        }
+            }
+        }
 
 
         //         stage('Deploy to Terraform To Nginx') {
@@ -202,11 +220,12 @@ pipeline {
 
     post {
         always {
-            emailext(
-                to: 'iitdwarka10@gmail.com',
-                subject: "Build ${currentBuild.currentResult}: ${env.JOB_NAME}",
-                body: "Check: ${env.BUILD_URL}"
-            )
+            // emailext(
+            //     to: 'iitdwarka10@gmail.com',
+            //     subject: "Build ${currentBuild.currentResult}: ${env.JOB_NAME}",
+            //     body: "Check: ${env.BUILD_URL}"
+            // )
+            echo 'Pipeline Completed successfully'
         }
         success {
             echo 'Image pushed successfully 🚀'
