@@ -29,32 +29,25 @@ pipeline {
             }
 
         stage('Deploy to Snake Game To Nginx') {
-            steps {             
-                     sh '''
-                 echo "Cleaning Nginx web directory..."
-                    rm -rf /usr/share/nginx/html/*
-
-                 echo "Copying snake.html...."
-                 '''
-
-                    sshPublisher(
-                        publishers: [
-                            sshPublisherDesc(
-                                configName: 'web-server',
-                                transfers: [
-                                    sshTransfer(
-                                        sourceFiles: 'snake.html',
-                                        removePrefix: '',
-                                        remoteDirectory: '/usr/share/nginx/html',
-                                        execCommand: 'sudo systemctl reload nginx'
-                                              )
-                                             ],
-                                            verbose: true
-                                    )
-                                 ]
-                             )
-                }
-            }
+    steps {
+        sshPublisher(
+            publishers: [
+                sshPublisherDesc(
+                    configName: 'web-server',
+                    transfers: [
+                        sshTransfer(
+                            sourceFiles: 'snake.html',
+                            removePrefix: '',
+                            remoteDirectory: '/tmp',
+                            execCommand: 'sudo install -m 644 /tmp/snake.html /usr/share/nginx/html/index.html && rm -f /tmp/snake.html && sudo systemctl reload nginx'
+                        )
+                    ],
+                    verbose: true
+                )
+            ]
+        )
+    }
+}
         
 
 
