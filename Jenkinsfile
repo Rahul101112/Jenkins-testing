@@ -8,11 +8,11 @@ pipeline {
     // }
 
     stages {
-        // stage('Checkout') {
-        //     steps {
-        //         checkout scm
-        //     }
-        // }
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
         stage('Check Agent') {
             steps {
                 // echo "Running on node: ${env.NODE_NAME}"
@@ -22,76 +22,82 @@ pipeline {
             }
         }
 
-        stage('Deploy to Snake Game To Nginx') {
-            steps {
-                withCredentials([
-                string(credentialsId: 'web-server-ip', variable: 'SERVER_IP'),
-                usernamePassword(
-                credentialsId: 'web-server-creds',
-                usernameVariable: 'USER',
-                passwordVariable: 'PASS'
-                        )
-                ])
-
-                {
-                    sh '''
-                echo "Cleaning Nginx web directory..."
-
-                sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
-                    rm -rf /var/www/snake/*
-                "
-
-                echo "Copying snake.html...."
-
-                sshpass -p "$PASS" scp -o StrictHostKeyChecking=no \
-                    snake.html \
-                    $USER@$SERVER_IP:/var/www/snake/index.html
-
-                echo "Reloading Nginx..."
-
-                sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
-                    sudo systemctl reload nginx
-                "
-                '''
+        stage('Hello World'){
+            steps{
+                echo "Hello Rahul Welcome to Jenkins Learning"
                 }
             }
-        }
+
+        // stage('Deploy to Snake Game To Nginx') {
+        //     steps {
+        //         withCredentials([
+        //         string(credentialsId: 'web-server-ip', variable: 'SERVER_IP'),
+        //         usernamePassword(
+        //         credentialsId: 'web-server-creds',
+        //         usernameVariable: 'USER',
+        //         passwordVariable: 'PASS'
+        //                 )
+        //         ])
+
+        //         {
+        //             sh '''
+        //         echo "Cleaning Nginx web directory..."
+
+        //         sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
+        //             rm -rf /var/www/snake/*
+        //         "
+
+        //         echo "Copying snake.html...."
+
+        //         sshpass -p "$PASS" scp -o StrictHostKeyChecking=no \
+        //             snake.html \
+        //             $USER@$SERVER_IP:/var/www/snake/index.html
+
+        //         echo "Reloading Nginx..."
+
+        //         sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
+        //             sudo systemctl reload nginx
+        //         "
+        //         '''
+        //         }
+        //     }
+        // }
 
 
-                stage('Deploy to Terraform To Nginx') {
-            steps {
-                withCredentials([
-                string(credentialsId: 'web-server-ip', variable: 'SERVER_IP'),
-                usernamePassword(
-                credentialsId: 'web-server-creds',
-                usernameVariable: 'USER',
-                passwordVariable: 'PASS'
-                        )
-                ])
+        //         stage('Deploy to Terraform To Nginx') {
+        //     steps {
+        //         withCredentials([
+        //         string(credentialsId: 'web-server-ip', variable: 'SERVER_IP'),
+        //         usernamePassword(
+        //         credentialsId: 'web-server-creds',
+        //         usernameVariable: 'USER',
+        //         passwordVariable: 'PASS'
+        //                 )
+        //         ])
 
-                {
-                    sh '''
-                echo "Cleaning Nginx web directory..."
+        //         {
+        //             sh '''
+        //         echo "Cleaning Nginx web directory..."
 
-                sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
-                    rm -rf /var/www/Terraform/*
-                "
+        //         sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
+        //             rm -rf /var/www/Terraform/*
+        //         "
 
-                echo "Copying Terraform files...."
+        //         echo "Copying Terraform files...."
 
-                sshpass -p "$PASS" scp -o StrictHostKeyChecking=no \
-                    Terraform_Interview_Q_A.html \
-                    $USER@$SERVER_IP:/var/www/Terraform/index.html
+        //         sshpass -p "$PASS" scp -o StrictHostKeyChecking=no \
+        //             Terraform_Interview_Q_A.html \
+        //             $USER@$SERVER_IP:/var/www/Terraform/index.html
 
-                echo "Reloading Nginx..."
+        //         echo "Reloading Nginx..."
 
-                sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
-                    sudo systemctl reload nginx
-                "
-                '''
-                }
-            }
-        }
+        //         sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no $USER@$SERVER_IP "
+        //             sudo systemctl reload nginx
+        //         "
+        //         '''
+        //         }
+        //     }
+        // }
 
         // stage('Build Image') {
         //     steps {
