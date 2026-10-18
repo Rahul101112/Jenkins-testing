@@ -28,7 +28,8 @@ pipeline {
                 }
             }
 
-        stage('Deploy to Snake Game To Nginx') {
+       
+stage('Deploy Snake Game') {
     steps {
         sshPublisher(
             publishers: [
@@ -38,8 +39,8 @@ pipeline {
                         sshTransfer(
                             sourceFiles: 'snake.html',
                             removePrefix: '',
-                            remoteDirectory: '/tmp',
-                            execCommand: 'sudo install -m 644 /tmp/snake.html /usr/share/nginx/html/index.html && rm -f /tmp/snake.html && sudo systemctl reload nginx'
+                            remoteDirectory: '',
+                            execCommand: ''
                         )
                     ],
                     verbose: true
@@ -48,6 +49,7 @@ pipeline {
         )
     }
 }
+
         
 
 
