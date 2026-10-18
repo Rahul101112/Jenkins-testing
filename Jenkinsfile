@@ -1,11 +1,11 @@
 pipeline {
     agent any
 
-    // environment {
-    //     ACR_NAME = 'jenkinstesting1801.azurecr.io'
-    //     IMAGE_NAME = 'myapp'
-    //     TAG = "${env.BUILD_NUMBER}"
-    // }
+    environment {
+        ACR_NAME = 'jenkinstesting1801.azurecr.io'
+        IMAGE_NAME = 'myapp'
+        TAG = "${env.BUILD_NUMBER}"
+    }
 
     stages {
         stage('Checkout') {
@@ -201,13 +201,13 @@ pipeline {
     }
 
     post {
-        // always {
-        //     emailext(
-        //         to: 'nahipata2022@gmail.com',
-        //         subject: "Build ${currentBuild.currentResult}: ${env.JOB_NAME}",
-        //         body: "Check: ${env.BUILD_URL}"
-        //     )
-        // }
+        always {
+            emailext(
+                to: 'iitdwarka10@gmail.com',
+                subject: "Build ${currentBuild.currentResult}: ${env.JOB_NAME}",
+                body: "Check: ${env.BUILD_URL}"
+            )
+        }
         success {
             echo 'Image pushed successfully 🚀'
         }
