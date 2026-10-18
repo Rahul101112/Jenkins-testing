@@ -29,10 +29,7 @@ pipeline {
             }
 
         stage('Deploy to Snake Game To Nginx') {
-            steps {
-               
-
-                {
+            steps {             
                      sh '''
                  echo "Cleaning Nginx web directory..."
                     rm -rf /usr/share/nginx/html/*
@@ -40,25 +37,25 @@ pipeline {
                  echo "Copying snake.html...."
                  '''
 
-                sshPublisher(
-            publishers: [
-                sshPublisherDesc(
-                    configName: 'web-server',
-                    transfers: [
-                        sshTransfer(
-                            sourceFiles: 'snake.html',
-                            removePrefix: '',
-                            remoteDirectory: '/usr/share/nginx/html',
-                            execCommand: 'sudo systemctl reload nginx'
-                        )
-                    ],
-                    verbose: true
-                )
-            ]
-        )
+                    sshPublisher(
+                        publishers: [
+                            sshPublisherDesc(
+                                configName: 'web-server',
+                                transfers: [
+                                    sshTransfer(
+                                        sourceFiles: 'snake.html',
+                                        removePrefix: '',
+                                        remoteDirectory: '/usr/share/nginx/html',
+                                        execCommand: 'sudo systemctl reload nginx'
+                                              )
+                                             ],
+                                            verbose: true
+                                    )
+                                 ]
+                             )
                 }
             }
-        }
+        
 
 
         //         stage('Deploy to Terraform To Nginx') {
@@ -196,7 +193,6 @@ pipeline {
     //     }
     // }
     }
-
     post {
         always {
             // emailext(
